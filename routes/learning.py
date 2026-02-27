@@ -25,13 +25,13 @@ def get_completed_challenges_count(user_id, cursor):
     result = cursor.fetchone()
     return result['cnt'] if result else 0
 
-@learning_bp.route('/recommendations')
-@learning_bp.route('/path')  # Alternative URL from results page
+@learning_bp.route('/')
+@learning_bp.route('/path')
 @login_required
-def recommendations():
+def learning_path():
+    """Display personalized learning path with horizontal scrolling"""
     user_id = session['user_id']
     age_group = session.get('age_group', '9-12')
-    unlock_level = get_unlock_level(user_id, mysql)
     
     cur = mysql.connection.cursor()
     
@@ -48,43 +48,112 @@ def recommendations():
         cur.close()
         return redirect(url_for('detection.stage1'))
     
-    recommendations_by_hobby = {}
-    completed_count = get_completed_challenges_count(user_id, cur)
+    # Build hobby sections with modules and lessons
+    hobby_sections = []
     
-    for row in hobby_rows:
-        subcategory = row['subcategory']
+    for idx, hobby_row in enumerate(hobby_rows):
+        subcategory = hobby_row['subcategory']
         
-        # Get recommendations for this subcategory and age group
+        # Determine emoji and color based on hobby
+        hobby_config = {
+            'Cricket': {'emoji': '🏏', 'color': 'green'},
+            'Football': {'emoji': '⚽', 'color': 'green'},
+            'Drawing': {'emoji': '🎨', 'color': 'pink'},
+            'Painting': {'emoji': '🎨', 'color': 'pink'},
+            'Singing': {'emoji': '🎵', 'color': 'purple'},
+            'Coding': {'emoji': '💻', 'color': 'indigo'},
+            'Maths': {'emoji': '🔢', 'color': 'blue'},
+            'Science': {'emoji': '🔬', 'color': 'green'},
+            'English': {'emoji': '📖', 'color': 'rose'},
+        }
+        
+        config = hobby_config.get(subcategory, {'emoji': '📚', 'color': 'indigo'})
+        
+        # Get learning content for this hobby
         cur.execute("""
-            SELECT * FROM recommendations 
-            WHERE subcategory=%s AND age_group=%s 
-            ORDER BY FIELD(level,'beginner','intermediate','advanced')
+            SELECT content_id, lesson_title, subject, concept, hobby_context
+            FROM learning_content 
+            WHERE LOWER(hobby_context) = LOWER(%s) AND age_group=%s 
+            ORDER BY content_id
+            LIMIT 10
         """, [subcategory, age_group])
+        lessons_data = cur.fetchall()
         
-        recs = cur.fetchall()
+        # Get completed assessments for this user
+        cur.execute("""
+            SELECT DISTINCT content_id, MAX(score) as best_score, MAX(total) as total_questions
+            FROM assessments 
+            WHERE user_id=%s
+            GROUP BY content_id
+        """, [user_id])
+        completed_map = {row['content_id']: row for row in cur.fetchall()}
         
-        # Add lock status and days remaining for each recommendation
-        for rec in recs:
-            if rec['level'] == 'beginner':
-                rec['locked'] = False
-                rec['days_remaining'] = 0
-            elif rec['level'] == 'intermediate':
-                rec['locked'] = unlock_level == 'beginner'
-                rec['days_remaining'] = max(0, 3 - completed_count)
-            else:  # advanced
-                rec['locked'] = unlock_level in ['beginner', 'intermediate']
-                rec['days_remaining'] = max(0, 7 - completed_count)
+        # Build modules (group lessons into modules of 3-4)
+        modules = []
+        module_size = 4
+        for i in range(0, len(lessons_data), module_size):
+            module_lessons = lessons_data[i:i+module_size]
+            
+            # Build lesson objects
+            lessons = []
+            for lesson_data in module_lessons:
+                completed_info = completed_map.get(lesson_data['content_id'])
+                is_completed = completed_info is not None
+                
+                # Calculate stars (0-3) based on score
+                stars = 0
+                if is_completed:
+                    score_pct = (completed_info['best_score'] / completed_info['total_questions']) * 100
+                    if score_pct >= 90:
+                        stars = 3
+                    elif score_pct >= 70:
+                        stars = 2
+                    else:
+                        stars = 1
+                
+                lessons.append({
+                    'id': lesson_data['content_id'],
+                    'title': lesson_data['lesson_title'],
+                    'emoji': config['emoji'],
+                    'completed': is_completed,
+                    'stars': stars,
+                    'xp_reward': 50,
+                    'content_type': 'micro'
+                })
+            
+            module_num = (i // module_size) + 1
+            lessons_done = sum(1 for l in lessons if l['completed'])
+            
+            modules.append({
+                'title': f'Module {module_num}',
+                'badge_icon': ['🌱', '🌿', '🌳', '🏆'][min(module_num-1, 3)],
+                'badge_name': f'{subcategory} Master {module_num}',
+                'lessons': lessons,
+                'progress': {
+                    'lessons_done': lessons_done,
+                    'completed': lessons_done == len(lessons),
+                    'badge_unlocked': lessons_done == len(lessons)
+                }
+            })
         
-        recommendations_by_hobby[subcategory] = recs
+        hobby_sections.append({
+            'hobby': subcategory,
+            'emoji': config['emoji'],
+            'color': config['color'],
+            'is_top': idx == 0,  # First hobby is top pick
+            'modules': modules
+        })
     
     cur.close()
     
-    return render_template('learning/recommendations.html',
-                         recommendations=recommendations_by_hobby,
-                         unlock_level=unlock_level,
-                         hobby_rows=hobby_rows,
-                         age_group=age_group,
-                         completed_count=completed_count)
+    return render_template('learning/path.html',
+                         hobby_sections=hobby_sections)
+
+@learning_bp.route('/recommendations')
+@login_required
+def recommendations():
+    """Old recommendations page - redirect to new learning path"""
+    return redirect(url_for('learning.learning_path'))
 
 @learning_bp.route('/lesson/<int:rec_id>')
 @login_required
@@ -245,32 +314,4 @@ def quiz_result(content_id, score, attempt):
                          attempt=attempt,
                          xp_earned=xp_earned)
 
-@learning_bp.route('/path')
-@login_required
-def learning_path():
-    """Display personalized learning path"""
-    user_id = session['user_id']
-    age_group = session.get('age_group', '9-12')
-    
-    cur = mysql.connection.cursor()
-    
-    # Get learning content based on user's hobbies
-    cur.execute("""
-        SELECT hs.subcategory, lc.content_id, lc.lesson_title, lc.subject, lc.hobby_context 
-        FROM hobby_scores hs 
-        JOIN learning_content lc ON lc.hobby_context = LOWER(hs.subcategory) AND lc.age_group=%s 
-        WHERE hs.user_id=%s AND hs.percentage > 50 
-        ORDER BY hs.percentage DESC 
-        LIMIT 7
-    """, [age_group, user_id])
-    path_items = cur.fetchall()
-    
-    # Get completed content IDs
-    cur.execute("SELECT DISTINCT content_id FROM assessments WHERE user_id=%s", [user_id])
-    completed_ids = [r['content_id'] for r in cur.fetchall()]
-    
-    cur.close()
-    
-    return render_template('learning/path.html', 
-                         path_items=path_items, 
-                         completed_ids=completed_ids)
+

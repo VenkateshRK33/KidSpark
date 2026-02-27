@@ -1,134 +1,276 @@
 {% extends "base.html" %}
-
 {% block title %}Stage 3 — Quick Fire!{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/detection.css') }}">
+<style>
+/* ── STAGE 3 SPECIFIC OVERRIDES ── */
+
+/* Force horizontal wrapping row for tap cards */
+.tap-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+}
+
+/* Each tap card: fixed width so multiple fit per row */
+.tap-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 120px !important;
+  min-width: 100px !important;
+  max-width: 140px !important;
+  height: 110px !important;
+  padding: 12px 10px !important;
+  border-radius: 20px !important;
+  background: white !important;
+  border: 2px solid #e5e7eb !important;
+  cursor: pointer !important;
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.82rem !important;
+  color: var(--text) !important;
+  text-align: center !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06) !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.tap-card:hover {
+  transform: scale(1.08) translateY(-3px) !important;
+  border-color: var(--indigo) !important;
+  box-shadow: 0 8px 20px rgba(99,102,241,0.18) !important;
+}
+
+.tap-card.tapped {
+  background: var(--green-l) !important;
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  transform: scale(1.06) !important;
+  box-shadow: 0 6px 18px rgba(16,185,129,0.25) !important;
+  animation: tapPop 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+
+/* Checkmark badge on tapped cards */
+.tap-card.tapped::after {
+  content: '✓';
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: var(--green);
+}
+
+.tap-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  display: block;
+}
+
+.tap-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Category section heading */
+.cat-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Baloo 2', cursive;
+  font-weight: 800;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+/* Timer box */
+.timer-box {
+  position: fixed;
+  top: 80px;
+  right: 32px;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: white;
+  border: 2px solid var(--indigo-l);
+  box-shadow: 0 6px 20px rgba(99,102,241,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Baloo 2', cursive;
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: var(--indigo);
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+.timer-box.urgent {
+  background: var(--rose-l);
+  border-color: var(--rose);
+  color: var(--rose);
+  animation: urgentPulse 0.8s ease-in-out infinite;
+}
+
+/* Selected count pill */
+.selected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 16px;
+  border-radius: 50px;
+  background: var(--indigo-l);
+  color: var(--indigo);
+  font-family: 'Baloo 2', cursive;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="detection-container">
-  <!-- Progress Dots -->
-  <div class="progress-dots">
-    <div class="dot done">1</div>
-    <div class="dot done">2</div>
-    <div class="dot active">3</div>
-    <div class="dot">4</div>
-    <div class="dot">5</div>
+<div class="stage-page">
+  
+  <!-- STEP DOTS -->
+  <div class="stage-dots f1">
+    <div class="stage-dot done">1</div>
+    <div class="stage-dot done">2</div>
+    <div class="stage-dot active">3</div>
+    <div class="stage-dot">4</div>
+    <div class="stage-dot">5</div>
   </div>
-
-  <!-- Header with Timer -->
-  <div class="stage-header-modern stage-header-with-timer">
-    <div>
-      <h1 class="stage-title-modern">⚡ Quick Fire!</h1>
-      <p class="stage-subtitle-modern">Tap everything you love — as fast as you can!</p>
+  
+  <!-- HEADER -->
+  <div class="stage-title f1">⚡ Quick Fire!</div>
+  <div class="stage-subtitle f2">Tap everything you love — as fast as you can!</div>
+  
+  <!-- SELECTED COUNT -->
+  <div style="text-align:center" class="f2">
+    <div class="selected-pill">
+      Selected: <span id="selectedCount">0</span>
     </div>
-    <div class="timer-display-modern" id="timerDisplay">30</div>
   </div>
-
-  <!-- Selected Counter -->
-  <div class="selected-counter-modern">
-    Selected: <span id="selectedCount">0</span>
+  
+  <!-- FIXED TIMER (top right corner) -->
+  <div class="timer-box" id="timerDisplay">
+    {{ 45 if age_group == '5-8' else 30 }}
   </div>
-
-  <!-- Form -->
-  <form method="POST" action="{{ url_for('detection.stage3') }}" id="stage3Form">
+  
+  <!-- FORM -->
+  <form method="POST"
+        action="{{ url_for('detection.stage3') }}"
+        id="stage3Form"
+        style="max-width:900px;margin:0 auto">
     
-    <!-- Sports Category -->
-    <div class="category-section-modern">
-      <div class="category-label-modern" style="color: var(--green);">⚽ Sports</div>
-      <div class="hobby-grid-modern">
+    <!-- ══ SPORTS ROW ══ -->
+    <div style="margin-bottom:28px" class="f3">
+      <div class="cat-head" style="color:var(--green)">
+        ⚽ Sports
+      </div>
+      <div class="tap-row">
         {% for item in sports_items %}
-        <div class="hobby-card-modern" data-hobby="{{ item.key }}">
-          <div class="hobby-emoji-modern">{{ item.emoji }}</div>
-          <div class="hobby-label-modern">{{ item.name }}</div>
+        <div class="tap-card"
+             data-hobby="{{ item.key }}"
+             onclick="tapCard(this)">
+          <span class="tap-emoji">{{ item.emoji }}</span>
+          <span class="tap-label">{{ item.name }}</span>
         </div>
         {% endfor %}
       </div>
     </div>
-
-    <!-- Arts Category -->
-    <div class="category-section-modern">
-      <div class="category-label-modern" style="color: var(--pink);">🎨 Arts</div>
-      <div class="hobby-grid-modern">
+    
+    <!-- ══ ARTS ROW ══ -->
+    <div style="margin-bottom:28px" class="f4">
+      <div class="cat-head" style="color:var(--pink)">
+        🎨 Arts &amp; Creativity
+      </div>
+      <div class="tap-row">
         {% for item in arts_items %}
-        <div class="hobby-card-modern" data-hobby="{{ item.key }}">
-          <div class="hobby-emoji-modern">{{ item.emoji }}</div>
-          <div class="hobby-label-modern">{{ item.name }}</div>
+        <div class="tap-card"
+             data-hobby="{{ item.key }}"
+             onclick="tapCard(this)">
+          <span class="tap-emoji">{{ item.emoji }}</span>
+          <span class="tap-label">{{ item.name }}</span>
         </div>
         {% endfor %}
       </div>
     </div>
-
-    <!-- Academics Category -->
-    <div class="category-section-modern">
-      <div class="category-label-modern" style="color: var(--blue);">📚 Academics</div>
-      <div class="hobby-grid-modern">
+    
+    <!-- ══ ACADEMICS ROW ══ -->
+    <div style="margin-bottom:28px" class="f5">
+      <div class="cat-head" style="color:var(--blue)">
+        📚 Academics
+      </div>
+      <div class="tap-row">
         {% for item in academic_items %}
-        <div class="hobby-card-modern" data-hobby="{{ item.key }}">
-          <div class="hobby-emoji-modern">{{ item.emoji }}</div>
-          <div class="hobby-label-modern">{{ item.name }}</div>
+        <div class="tap-card"
+             data-hobby="{{ item.key }}"
+             onclick="tapCard(this)">
+          <span class="tap-emoji">{{ item.emoji }}</span>
+          <span class="tap-label">{{ item.name }}</span>
         </div>
         {% endfor %}
       </div>
     </div>
-
+    
+    <!-- Hidden input populated by JS -->
+    <input type="hidden" name="tapped_items" id="tappedInput" value="">
+  
   </form>
 </div>
 
+{% block extra_js %}
 <script>
-(function() {
-  const timerDuration = 30;
-  let timeLeft = timerDuration;
-  let selectedItems = [];
-  const timerDisplay = document.getElementById('timerDisplay');
-  const selectedCount = document.getElementById('selectedCount');
-  const form = document.getElementById('stage3Form');
-  
-  // Start timer
-  const timerInterval = setInterval(() => {
-    timeLeft--;
-    timerDisplay.textContent = timeLeft;
-    
-    if (timeLeft <= 10) {
-      timerDisplay.classList.add('warning');
-    }
-    
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      submitForm();
-    }
-  }, 1000);
-  
-  // Card selection
-  document.querySelectorAll('.hobby-card-modern').forEach(card => {
-    card.addEventListener('click', function() {
-      const hobby = this.dataset.hobby;
-      
-      if (this.classList.contains('selected')) {
-        this.classList.remove('selected');
-        selectedItems = selectedItems.filter(item => item !== hobby);
-      } else {
-        this.classList.add('selected');
-        selectedItems.push(hobby);
-      }
-      
-      selectedCount.textContent = selectedItems.length;
-    });
-  });
-  
-  // Submit function
-  function submitForm() {
-    selectedItems.forEach(item => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'tapped_items';
-      input.value = item;
-      form.appendChild(input);
-    });
-    
-    form.submit();
+/* ── Tap card toggle ── */
+const tapped = new Set();
+
+function tapCard(card) {
+  const val = card.dataset.hobby;
+  if (tapped.has(val)) {
+    tapped.delete(val);
+    card.classList.remove('tapped');
+  } else {
+    tapped.add(val);
+    card.classList.add('tapped');
+    /* XP float at card position */
+    const rect = card.getBoundingClientRect();
+    spawnXPFloat(rect.left + rect.width / 2, rect.top, '⭐');
   }
-})();
+  /* Update selected count */
+  document.getElementById('selectedCount').textContent = tapped.size;
+  /* Update hidden input */
+  document.getElementById('tappedInput').value = [...tapped].join(',');
+}
+
+/* ── Countdown timer ── */
+const DURATION = {{ 45 if age_group == '5-8' else 30 }};
+let remaining = DURATION;
+const timerEl = document.getElementById('timerDisplay');
+
+const countdown = setInterval(() => {
+  remaining--;
+  if (timerEl) {
+    timerEl.textContent = remaining;
+    if (remaining <= 10) {
+      timerEl.classList.add('urgent');
+    }
+  }
+  if (remaining <= 0) {
+    clearInterval(countdown);
+    document.getElementById('stage3Form').submit();
+  }
+}, 1000);
 </script>
+{% endblock %}
+
 {% endblock %}

@@ -10,7 +10,7 @@
       <div class="hero-name">Hey, <em>{{ name }}!</em> 👋</div>
       <div class="hero-sub">Your personalized adventure continues today</div>
       <div class="hero-actions">
-        <a href="{{ url_for('learning.recommendations') }}" class="btn btn-white btn-lg">▶ Continue Learning</a>
+        <a href="{{ url_for('learning.learning_path') }}" class="btn btn-white btn-lg">▶ Continue Learning</a>
         <a href="{{ url_for('dashboard.daily_challenge') }}" class="btn btn-outline-white btn-lg">🎯 Today's Challenge</a>
       </div>
     </div>
@@ -71,7 +71,7 @@
   <!-- CONTINUE LEARNING + DID YOU KNOW -->
   <div class="two-col f3">
     <!-- Continue learning -->
-    <div class="card card-pad" style="display:flex;flex-direction:column;gap:14px;cursor:pointer" onclick="window.location='{{ url_for('learning.recommendations') }}'">
+    <div class="card card-pad" style="display:flex;flex-direction:column;gap:14px;cursor:pointer" onclick="window.location='{{ url_for('learning.learning_path') }}'">>
       <div class="card-label">📚 Continue Where You Left Off</div>
       <div style="display:flex;align-items:center;gap:14px">
         <div style="width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--green-l),#a7f3d0);display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 12px rgba(16,185,129,0.2);flex-shrink:0">
@@ -94,7 +94,7 @@
         <div class="prog-meta"><span>Progress</span><span>{{ (total_xp // 10) if total_xp else 0 }}%</span></div>
         <div class="prog-track"><div class="prog-fill" data-width="{{ (total_xp // 10) if total_xp else 0 }}" style="width:0%"></div></div>
       </div>
-      <a href="{{ url_for('learning.recommendations') }}" class="btn btn-primary btn-sm" style="align-self:flex-start">Resume Lesson →</a>
+      <a href="{{ url_for('learning.learning_path') }}" class="btn btn-primary btn-sm" style="align-self:flex-start">Resume Lesson →</a>
     </div>
     
     <!-- Did you know -->

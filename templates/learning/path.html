@@ -1,336 +1,193 @@
 {% extends "base.html" %}
-
-{% block title %}My Learning Journey - KidSpark{% endblock %}
-
-{% block extra_css %}
-<style>
-    .path-container {
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 20px;
-    }
-    
-    .path-header {
-        text-align: center;
-        margin-bottom: 50px;
-    }
-    
-    .path-title {
-        font-size: 2.5rem;
-        color: #333;
-        margin-bottom: 10px;
-    }
-    
-    .path-subtitle {
-        font-size: 1.2rem;
-        color: #666;
-    }
-    
-    .timeline {
-        position: relative;
-        padding: 20px 0;
-    }
-    
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 50px;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .lesson-card {
-        position: relative;
-        background: white;
-        border-radius: 20px;
-        padding: 25px;
-        margin: 30px 0 30px 100px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .lesson-card:hover {
-        transform: translateX(5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    }
-    
-    .lesson-card.completed {
-        border-left: 5px solid #4caf50;
-    }
-    
-    .lesson-card.current {
-        border-left: 5px solid #2196f3;
-        animation: pulse 2s ease infinite;
-    }
-    
-    .lesson-card.upcoming {
-        opacity: 0.7;
-        border-left: 5px solid #e0e0e0;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        50% { box-shadow: 0 5px 30px rgba(33, 150, 243, 0.3); }
-    }
-    
-    .day-number {
-        position: absolute;
-        left: -75px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 50px;
-        height: 50px;
-        background: white;
-        border: 4px solid #667eea;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 1.2rem;
-        color: #667eea;
-        z-index: 2;
-    }
-    
-    .day-number.completed {
-        background: #4caf50;
-        border-color: #4caf50;
-        color: white;
-    }
-    
-    .day-number.current {
-        background: #2196f3;
-        border-color: #2196f3;
-        color: white;
-        animation: pulseDot 2s ease infinite;
-    }
-    
-    @keyframes pulseDot {
-        0%, 100% { transform: translateY(-50%) scale(1); }
-        50% { transform: translateY(-50%) scale(1.1); }
-    }
-    
-    .day-number.upcoming {
-        background: #f5f5f5;
-        border-color: #e0e0e0;
-        color: #999;
-    }
-    
-    .status-icon {
-        font-size: 1.5rem;
-    }
-    
-    .lesson-header {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .hobby-emoji {
-        font-size: 2rem;
-    }
-    
-    .lesson-title {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #333;
-        flex: 1;
-    }
-    
-    .subject-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 15px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-    
-    .badge-maths { background: #e3f2fd; color: #1976d2; }
-    .badge-science { background: #e8f5e9; color: #388e3c; }
-    .badge-english { background: #fce4ec; color: #c2185b; }
-    
-    .lesson-status {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid #e0e0e0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .status-text {
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-    
-    .status-completed {
-        color: #4caf50;
-    }
-    
-    .status-current {
-        color: #2196f3;
-    }
-    
-    .status-upcoming {
-        color: #999;
-    }
-    
-    .lesson-link {
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .lesson-link:hover {
-        text-decoration: none;
-    }
-    
-    .start-button {
-        padding: 10px 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 20px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    
-    .start-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .locked-tooltip {
-        position: relative;
-        cursor: not-allowed;
-    }
-    
-    .locked-tooltip:hover::after {
-        content: 'Complete previous lessons first';
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #333;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        z-index: 10;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-    }
-    
-    .empty-state h2 {
-        color: #333;
-        margin-bottom: 15px;
-    }
-    
-    .empty-state p {
-        color: #666;
-        font-size: 1.1rem;
-        margin-bottom: 30px;
-    }
-    
-    .empty-state .btn {
-        display: inline-block;
-        padding: 15px 30px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 25px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .empty-state .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-</style>
-{% endblock %}
+{% block title %}My Learning Path — KidSpark{% endblock %}
 
 {% block content %}
-<div class="path-container">
-    <div class="path-header">
-        <h1 class="path-title">🚀 My Learning Journey</h1>
-        <p class="path-subtitle">Personalized lessons based on your interests</p>
+<div class="page-main" style="max-width:1100px">
+
+  <!-- PAGE HEADER -->
+  <div style="text-align:center;margin-bottom:32px" class="f1">
+    <div style="font-family:'Baloo 2',cursive;font-weight:900;font-size:2.2rem;color:var(--dark);margin-bottom:8px">
+      🚀 My Learning Path
     </div>
-    
-    {% if path_items %}
-    <div class="timeline">
-        {% for item in path_items %}
-        {% set is_completed = item.content_id in completed_ids %}
-        {% set is_current = loop.first and not is_completed %}
-        {% set is_upcoming = not is_completed and not is_current %}
-        
-        <div class="lesson-card {% if is_completed %}completed{% elif is_current %}current{% else %}upcoming{% endif %}">
-            <div class="day-number {% if is_completed %}completed{% elif is_current %}current{% else %}upcoming{% endif %}">
-                {% if is_completed %}
-                    <span class="status-icon">✓</span>
-                {% elif is_current %}
-                    <span class="status-icon">●</span>
-                {% else %}
-                    {{ loop.index }}
-                {% endif %}
-            </div>
-            
-            <div class="lesson-header">
-                <div class="hobby-emoji">
-                    {% if item.hobby_context == 'cricket' %}🏏
-                    {% elif item.hobby_context == 'football' %}⚽
-                    {% elif item.hobby_context == 'drawing' %}✏️
-                    {% elif item.hobby_context == 'singing' %}🎤
-                    {% elif item.hobby_context == 'coding' %}💻
-                    {% else %}📚{% endif %}
-                </div>
-                <div class="lesson-title">{{ item.lesson_title }}</div>
-                <span class="subject-badge badge-{{ item.subject.lower() }}">
-                    {{ item.subject }}
-                </span>
-            </div>
-            
-            <div class="lesson-status">
-                {% if is_completed %}
-                    <span class="status-text status-completed">✅ Completed</span>
-                    <a href="{{ url_for('learning.content_lesson', content_id=item.content_id) }}" class="start-button">
-                        Review Lesson
-                    </a>
-                {% elif is_current %}
-                    <span class="status-text status-current">📍 Start Here</span>
-                    <a href="{{ url_for('learning.content_lesson', content_id=item.content_id) }}" class="start-button">
-                        Start Lesson →
-                    </a>
-                {% else %}
-                    <span class="status-text status-upcoming">🔒 Locked</span>
-                    <span class="locked-tooltip">
-                        <span style="padding: 10px 20px; background: #e0e0e0; color: #999; border-radius: 20px; font-weight: 600;">
-                            Complete Previous
-                        </span>
-                    </span>
-                {% endif %}
-            </div>
+    <div style="font-size:1rem;font-weight:600;color:var(--muted)">
+      Personalized lessons based on your interests
+    </div>
+  </div>
+
+  <!-- HOBBY SECTIONS -->
+  {% for section in hobby_sections %}
+  <div class="hobby-section f{{ loop.index + 1 }}" style="margin-bottom:32px">
+
+    <!-- SECTION HEADER (clickable to collapse/expand) -->
+    <div class="hobby-section-header"
+         onclick="toggleSection('section-{{ loop.index }}')"
+         style="display:flex;align-items:center;justify-content:space-between;
+                padding:16px 24px;border-radius:20px;cursor:pointer;
+                background:{% if section.is_top %}linear-gradient(135deg,var(--{{ section.color }}-l),white){% else %}white{% endif %};
+                border:2px solid var(--{{ section.color }}-l);
+                box-shadow:0 4px 16px rgba(0,0,0,0.06);margin-bottom:16px;
+                transition:all 0.3s ease">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:2rem">{{ section.emoji }}</span>
+        <div>
+          <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:1.2rem;color:var(--dark)">
+            {{ section.hobby }}
+            {% if section.is_top %}
+            <span style="font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:20px;
+                          background:var(--yellow-l);color:#92400e;margin-left:8px;vertical-align:middle">
+              ⭐ TOP PICK
+            </span>
+            {% endif %}
+          </div>
+          <div style="font-size:0.8rem;font-weight:600;color:var(--muted)">
+            {{ section.modules|length }} Modules · {% set total_lessons = section.modules|map(attribute='lessons')|map('length')|sum %}{{ total_lessons }} Lessons
+          </div>
         </div>
-        {% endfor %}
+      </div>
+      <span class="section-arrow" id="arrow-{{ loop.index }}"
+            style="font-size:1.4rem;transition:transform 0.3s ease;
+                   transform:{% if section.is_top %}rotate(90deg){% else %}rotate(0deg){% endif %}">›</span>
     </div>
-    {% else %}
-    <div class="empty-state">
-        <h2>🎯 No Learning Path Yet</h2>
-        <p>Complete your hobby detection to get personalized learning recommendations!</p>
-        <a href="{{ url_for('detection.stage1') }}" class="btn">
-            Start Hobby Detection →
-        </a>
+
+    <!-- MODULES TRACK (horizontal scrolling road) -->
+    <div class="section-content" id="section-{{ loop.index }}"
+         style="display:{% if section.is_top %}block{% else %}none{% endif %}">
+
+      {% for module in section.modules %}
+      <!-- MODULE BLOCK -->
+      <div style="margin-bottom:24px">
+
+        <!-- Module label -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-left:8px">
+          <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;color:var(--dark)">
+            {{ module.badge_icon }} {{ module.title }}
+          </div>
+          <!-- Module XP progress -->
+          <div style="flex:1;max-width:200px">
+            <div class="prog-track" style="height:6px">
+              <div class="prog-fill prog-fill-{{ section.color }}"
+                   data-width="{{ ((module.progress.lessons_done / [module.lessons|length,1]|max) * 100)|int }}"
+                   style="width:0%"></div>
+            </div>
+          </div>
+          <div style="font-size:0.75rem;font-weight:700;color:var(--muted)">
+            {{ module.progress.lessons_done }}/{{ module.lessons|length }} done
+          </div>
+          {% if module.progress.badge_unlocked %}
+          <div style="padding:3px 10px;border-radius:20px;background:var(--yellow-l);
+                       font-size:0.72rem;font-weight:700;color:#92400e">
+            {{ module.badge_icon }} {{ module.badge_name }}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- HORIZONTAL TRACK – scrollable row of lesson nodes -->
+        <div class="lesson-track" style="display:flex;align-items:center;gap:0;
+              overflow-x:auto;padding:16px 8px 20px;
+              scrollbar-width:none;">
+
+          {% for lesson in module.lessons %}
+
+          <!-- Arrow connector (between lessons) -->
+          {% if not loop.first %}
+          <div style="display:flex;align-items:center;flex-shrink:0">
+            <div style="width:40px;height:3px;
+                        background:{% if lesson.completed %}var(--{{ section.color }}){% else %}#e5e7eb{% endif %};
+                        border-radius:3px;position:relative">
+              <!-- recommended arrow -->
+              {% if not lesson.completed %}
+              <div style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);
+                           font-size:0.9rem;color:var(--{{ section.color }})">›</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- LESSON NODE -->
+          <a href="{{ url_for('learning.lesson_page', lesson_id=lesson.id) }}"
+             class="lesson-node {% if lesson.completed %}done{% elif loop.first or module.lessons[loop.index0 - 1].completed %}current{% else %}upcoming{% endif %}"
+             style="flex-shrink:0;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;width:110px">
+
+            <!-- Node circle -->
+            <div class="lesson-node-circle
+                         {% if lesson.completed %}done{% elif loop.first or (loop.index0 > 0 and module.lessons[loop.index0 - 1].completed) %}current{% else %}upcoming{% endif %}">
+              {% if lesson.completed %}
+              ✓
+              {% elif lesson.content_type == 'game' %}
+              🎮
+              {% else %}
+              {{ lesson.emoji }}
+              {% endif %}
+            </div>
+
+            <!-- Stars earned -->
+            <div style="display:flex;gap:2px">
+              {% for s in range(3) %}
+              <span style="font-size:0.75rem;{{ 'opacity:1' if s < lesson.stars else 'opacity:0.2' }}">⭐</span>
+              {% endfor %}
+            </div>
+
+            <!-- Lesson title -->
+            <div style="font-size:0.72rem;font-weight:700;color:var(--dark);text-align:center;line-height:1.3;max-width:100px">
+              {{ lesson.title }}
+            </div>
+
+            <!-- XP tag -->
+            <div style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;
+                         background:var(--yellow-l);color:#92400e">
+              +{{ lesson.xp_reward }} XP
+            </div>
+
+          </a>
+          {% endfor %}
+
+          <!-- MODULE END MILESTONE -->
+          <div style="display:flex;align-items:center;flex-shrink:0;gap:0">
+            <div style="width:40px;height:3px;background:#e5e7eb;border-radius:3px"></div>
+            <div style="width:60px;height:60px;border-radius:50%;
+                         background:{% if module.progress.completed %}linear-gradient(135deg,var(--yellow),var(--orange)){% else %}#f3f4f6{% endif %};
+                         display:flex;align-items:center;justify-content:center;
+                         font-size:1.8rem;border:3px solid {% if module.progress.completed %}var(--yellow){% else %}#e5e7eb{% endif %};
+                         box-shadow:{% if module.progress.completed %}0 6px 20px rgba(251,191,36,0.35){% else %}none{% endif %};
+                         flex-direction:column;flex-shrink:0;
+                         transition:all 0.3s ease">
+              {% if module.progress.completed %}
+              {{ module.badge_icon }}
+              {% else %}
+              🔒
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
     </div>
-    {% endif %}
+  </div>
+  {% endfor %}
+
 </div>
+
+{% block extra_js %}
+<script>
+function toggleSection(id) {
+  const content = document.getElementById(id);
+  const idx = id.split('-')[1];
+  const arrow = document.getElementById('arrow-' + idx);
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    content.style.animation = 'fadeUp 0.4s ease';
+    if (arrow) arrow.style.transform = 'rotate(90deg)';
+  } else {
+    content.style.display = 'none';
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  }
+}
+// Hide scrollbar on lesson tracks
+document.querySelectorAll('.lesson-track').forEach(t => {
+  t.style.msOverflowStyle = 'none';
+  t.style.scrollbarWidth = 'none';
+});
+</script>
+{% endblock %}
 {% endblock %}

@@ -1122,9 +1122,23 @@
 }
 
 .hobby-grid-modern {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 16px;
+    justify-content: center;
+}
+
+/* Make academics section specifically horizontal */
+.category-section-modern:has(.category-label-modern[style*="blue"]) .hobby-grid-modern {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 8px;
+}
+
+.category-section-modern:has(.category-label-modern[style*="blue"]) .hobby-card-modern {
+    flex: 0 0 auto;
+    min-width: 140px;
 }
 
 .hobby-card-modern {
@@ -1261,8 +1275,11 @@
     }
     
     .hobby-grid-modern {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 12px;
+    }
+    
+    .category-section-modern:has(.category-label-modern[style*="blue"]) .hobby-card-modern {
+        min-width: 120px;
     }
     
     .stage-title-modern {
@@ -1298,7 +1315,7 @@
     }
     
     .hobby-grid-modern {
-        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
     
     .detection-container {
