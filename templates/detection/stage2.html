@@ -1,98 +1,124 @@
 {% extends "base.html" %}
 
-{% block title %}Your Choices - KidSpark{% endblock %}
+{% block title %}Stage 2 — Your Choices{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/detection.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="detection-container stage2-bg">
-    <!-- Progress Bar -->
-    <div class="progress-container">
-        <div class="progress-bar" data-progress="40">
-            <div class="progress-fill"></div>
-        </div>
-        <div class="progress-text">Step 2 of 5</div>
-    </div>
+<div class="detection-container">
+  <!-- Progress Dots -->
+  <div class="progress-dots">
+    <div class="dot done">1</div>
+    <div class="dot active">2</div>
+    <div class="dot">3</div>
+    <div class="dot">4</div>
+    <div class="dot">5</div>
+  </div>
 
-    <!-- Scenario Counter -->
-    <div class="scenario-counter">
-        <span id="currentScenario">1</span> of {{ scenarios|length }}
-    </div>
+  <!-- Scenario Counter -->
+  <div class="scenario-counter-modern">
+    <span id="currentScenario">1</span> of {{ scenarios|length }}
+  </div>
 
-    <!-- Scenarios Form -->
-    <form method="POST" action="{{ url_for('detection.stage2') }}" id="stage2Form">
-        {% for scenario in scenarios %}
-        <div class="scenario-slide {% if loop.first %}active{% endif %}" data-scenario="{{ loop.index }}">
-            <div class="scenario-content">
-                <h2 class="scenario-title">{{ scenario.title }}</h2>
-                {% if age_group != '5-8' %}
-                <p class="scenario-story">{{ scenario.story }}</p>
-                {% endif %}
+  <!-- Scenarios Form -->
+  <form method="POST" action="{{ url_for('detection.stage2') }}" id="stage2Form">
+    {% for scenario in scenarios %}
+    <div class="scenario-slide-modern {% if loop.first %}active{% endif %}" data-scenario="{{ loop.index }}">
+      <div class="stage-header-modern">
+        <h1 class="stage-title-modern">{{ scenario.title }}</h1>
+        {% if age_group != '5-8' %}
+        <p class="stage-subtitle-modern">{{ scenario.story }}</p>
+        {% endif %}
+      </div>
 
-                <div class="choices-grid">
-                    {% for choice in scenario.choices %}
-                    <div class="choice-card" data-field="{{ choice.field }}" data-value="{{ choice.value }}">
-                        <div class="choice-emoji">{{ choice.emoji }}</div>
-                        <div class="choice-label">{{ choice.label }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {% if not loop.last %}
-            <button type="button" class="next-btn" disabled>Next →</button>
-            {% else %}
-            <button type="submit" class="submit-btn" disabled>Complete →</button>
-            {% endif %}
+      <div class="choices-grid-modern">
+        {% for choice in scenario.choices %}
+        <div class="choice-card-modern" data-field="{{ choice.field }}" data-value="{{ choice.value }}">
+          <div class="choice-emoji-modern">{{ choice.emoji }}</div>
+          <div class="choice-label-modern">{{ choice.label }}</div>
         </div>
         {% endfor %}
+      </div>
 
-        <!-- Hidden inputs for all answers -->
-        <input type="hidden" name="treasure" id="treasureInput" value="">
-        <input type="hidden" name="career_sports" id="career_sportsInput" value="">
-        <input type="hidden" name="fav_subject" id="fav_subjectInput" value="">
-        <input type="hidden" name="tv_choice" id="tv_choiceInput" value="">
-    </form>
+      <div class="button-container">
+        {% if not loop.last %}
+        <button type="button" class="btn-modern btn-primary-modern next-btn-modern" disabled>
+          Next →
+        </button>
+        {% else %}
+        <button type="submit" class="btn-modern btn-primary-modern submit-btn-modern" disabled>
+          Complete →
+        </button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Hidden inputs for all answers -->
+    <input type="hidden" name="treasure" id="treasureInput" value="">
+    <input type="hidden" name="career_sports" id="career_sportsInput" value="">
+    <input type="hidden" name="fav_subject" id="fav_subjectInput" value="">
+    <input type="hidden" name="tv_choice" id="tv_choiceInput" value="">
+  </form>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<script src="{{ url_for('static', filename='js/detection.js') }}"></script>
 <script>
-    console.log('Stage 2 initializing with', {{ scenarios|length }}, 'scenarios');
-    initStage2({{ scenarios|length }});
-    
-    // Debug: Check if buttons exist
-    console.log('Next buttons found:', document.querySelectorAll('.next-btn').length);
-    console.log('Submit buttons found:', document.querySelectorAll('.submit-btn').length);
-    
-    // Debug: Log form submission
-    const form = document.getElementById('stage2Form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            console.log('✅ Form submitting with values:');
-            console.log('treasure:', document.getElementById('treasureInput').value);
-            console.log('career_sports:', document.getElementById('career_sportsInput').value);
-            console.log('fav_subject:', document.getElementById('fav_subjectInput').value);
-            console.log('tv_choice:', document.getElementById('tv_choiceInput').value);
-            
-            // Don't prevent default - let it submit
-        });
-    } else {
-        console.error('❌ Form not found!');
-    }
-    
-    // Force enable submit button after 2 seconds for testing
-    setTimeout(() => {
-        const submitBtn = document.querySelector('.submit-btn');
-        if (submitBtn) {
-            console.log('Force enabling submit button for testing');
-            submitBtn.disabled = false;
-            submitBtn.style.opacity = '1';
-            submitBtn.style.cursor = 'pointer';
-        }
-    }, 2000);
+(function() {
+  let currentScenario = 1;
+  const totalScenarios = {{ scenarios|length }};
+  const slides = document.querySelectorAll('.scenario-slide-modern');
+  
+  // Show only first slide
+  slides.forEach((slide, index) => {
+    slide.style.display = index === 0 ? 'block' : 'none';
+  });
+  
+  // Choice selection
+  document.querySelectorAll('.choice-card-modern').forEach(card => {
+    card.addEventListener('click', function() {
+      const slide = this.closest('.scenario-slide-modern');
+      const choices = slide.querySelectorAll('.choice-card-modern');
+      
+      // Remove selected from all
+      choices.forEach(c => c.classList.remove('selected'));
+      
+      // Add selected to clicked
+      this.classList.add('selected');
+      
+      // Store value
+      const field = this.dataset.field;
+      const value = this.dataset.value;
+      const input = document.getElementById(field + 'Input');
+      if (input) {
+        input.value = value;
+      }
+      
+      // Enable button
+      const btn = slide.querySelector('.next-btn-modern, .submit-btn-modern');
+      if (btn) {
+        btn.disabled = false;
+      }
+    });
+  });
+  
+  // Next button clicks
+  document.querySelectorAll('.next-btn-modern').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (currentScenario < totalScenarios) {
+        // Hide current
+        slides[currentScenario - 1].style.display = 'none';
+        
+        // Show next
+        currentScenario++;
+        slides[currentScenario - 1].style.display = 'block';
+        
+        // Update counter
+        document.getElementById('currentScenario').textContent = currentScenario;
+      }
+    });
+  });
+})();
 </script>
 {% endblock %}

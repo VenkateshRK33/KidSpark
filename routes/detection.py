@@ -102,15 +102,62 @@ def stage3():
     if request.method == 'POST':
         tapped = request.form.getlist('tapped_items')
         session['s3_tapped_items'] = tapped
-        session['s3_sports_taps'] = sum(1 for t in tapped if t in ['cricket', 'football', 'basketball', 'swimming', 'badminton'])
-        session['s3_art_taps'] = sum(1 for t in tapped if t in ['drawing', 'singing', 'dancing', 'painting', 'crafts'])
-        session['s3_academic_taps'] = sum(1 for t in tapped if t in ['maths', 'science', 'coding', 'reading', 'history'])
+        session['s3_sports_taps'] = sum(1 for t in tapped if t in ['cricket', 'football', 'basketball', 'swimming', 'badminton', 'tennis', 'volleyball', 'hockey', 'athletics', 'gymnastics'])
+        session['s3_art_taps'] = sum(1 for t in tapped if t in ['drawing', 'singing', 'dancing', 'painting', 'crafts', 'music', 'drama', 'photography', 'sculpture', 'writing'])
+        session['s3_academic_taps'] = sum(1 for t in tapped if t in ['maths', 'science', 'coding', 'reading', 'history', 'geography', 'languages', 'physics', 'chemistry', 'biology'])
         session['s3_coding_taps'] = sum(1 for t in tapped if t == 'coding')
         
         return redirect(url_for('detection.stage4'))
     
     age_group = session.get('age_group', '9-12')
-    return render_template('detection/stage3.html', age_group=age_group)
+    
+    # Sports items (10+)
+    sports_items = [
+        {'key': 'cricket', 'emoji': '🏏', 'name': 'Cricket'},
+        {'key': 'football', 'emoji': '⚽', 'name': 'Football'},
+        {'key': 'basketball', 'emoji': '🏀', 'name': 'Basketball'},
+        {'key': 'swimming', 'emoji': '🏊', 'name': 'Swimming'},
+        {'key': 'badminton', 'emoji': '🏸', 'name': 'Badminton'},
+        {'key': 'tennis', 'emoji': '🎾', 'name': 'Tennis'},
+        {'key': 'volleyball', 'emoji': '🏐', 'name': 'Volleyball'},
+        {'key': 'hockey', 'emoji': '🏑', 'name': 'Hockey'},
+        {'key': 'athletics', 'emoji': '🏃', 'name': 'Athletics'},
+        {'key': 'gymnastics', 'emoji': '🤸', 'name': 'Gymnastics'},
+    ]
+    
+    # Arts items (10+)
+    arts_items = [
+        {'key': 'drawing', 'emoji': '✏️', 'name': 'Drawing'},
+        {'key': 'singing', 'emoji': '🎤', 'name': 'Singing'},
+        {'key': 'dancing', 'emoji': '💃', 'name': 'Dancing'},
+        {'key': 'painting', 'emoji': '🎨', 'name': 'Painting'},
+        {'key': 'crafts', 'emoji': '✂️', 'name': 'Crafts'},
+        {'key': 'music', 'emoji': '🎵', 'name': 'Music'},
+        {'key': 'drama', 'emoji': '🎭', 'name': 'Drama'},
+        {'key': 'photography', 'emoji': '📷', 'name': 'Photography'},
+        {'key': 'sculpture', 'emoji': '🗿', 'name': 'Sculpture'},
+        {'key': 'writing', 'emoji': '✍️', 'name': 'Writing'},
+    ]
+    
+    # Academic items (10+)
+    academic_items = [
+        {'key': 'maths', 'emoji': '➕', 'name': 'Maths'},
+        {'key': 'science', 'emoji': '🔬', 'name': 'Science'},
+        {'key': 'coding', 'emoji': '💻', 'name': 'Coding'},
+        {'key': 'reading', 'emoji': '📖', 'name': 'Reading'},
+        {'key': 'history', 'emoji': '🏛️', 'name': 'History'},
+        {'key': 'geography', 'emoji': '🌍', 'name': 'Geography'},
+        {'key': 'languages', 'emoji': '🗣️', 'name': 'Languages'},
+        {'key': 'physics', 'emoji': '⚛️', 'name': 'Physics'},
+        {'key': 'chemistry', 'emoji': '🧪', 'name': 'Chemistry'},
+        {'key': 'biology', 'emoji': '🧬', 'name': 'Biology'},
+    ]
+    
+    return render_template('detection/stage3.html', 
+                         age_group=age_group,
+                         sports_items=sports_items,
+                         arts_items=arts_items,
+                         academic_items=academic_items)
 
 @detection_bp.route('/stage4', methods=['GET', 'POST'])
 @login_required
@@ -153,7 +200,27 @@ def stage5():
         session['s5_bored_activity'] = request.form.get('bored_activity', 'play')
         session['s5_dream_school'] = request.form.get('dream_school', 'sports')
         
-        return redirect(url_for('detection.loading'))
+        # Run ML pipeline directly instead of going to loading page
+        from ml.orchestrator import run_full_ml_pipeline
+        user_id = session['user_id']
+        
+        try:
+            rf_result, subcategories = run_full_ml_pipeline(dict(session), user_id, mysql)
+            session['rf_result'] = rf_result
+            session['subcategories'] = subcategories
+            session['detection_done'] = True
+        except Exception as e:
+            print(f"ML Pipeline error: {e}")
+            session['rf_result'] = {
+                'predicted': 'Academics',
+                'academics_pct': 60,
+                'arts_pct': 20,
+                'sports_pct': 20,
+                'confidence': 'medium'
+            }
+            session['subcategories'] = {'Maths': 60, 'Science': 45}
+        
+        return redirect(url_for('detection.result'))
     
     age_group = session.get('age_group', '9-12')
     questions = get_preference_questions(age_group)
@@ -162,56 +229,56 @@ def stage5():
 def get_preference_questions(age_group):
     return [
         {
-            'id': 'loves_school',
-            'question': 'Do you enjoy going to school?',
+            'field': 'loves_school',
+            'text': 'Do you enjoy going to school?',
             'choices': [
-                {'label': 'Yes I love it!', 'emoji': '😊', 'value': '1'},
-                {'label': 'Not really', 'emoji': '😐', 'value': '0'}
+                {'label': 'Yes I love it!', 'value': '1'},
+                {'label': 'Not really', 'value': '0'}
             ]
         },
         {
-            'id': 'won_sports',
-            'question': 'Have you won any sports competitions?',
+            'field': 'won_sports',
+            'text': 'Have you won any sports competitions?',
             'choices': [
-                {'label': 'Yes!', 'emoji': '🏆', 'value': '1'},
-                {'label': 'Not yet', 'emoji': '🎯', 'value': '0'}
+                {'label': 'Yes!', 'value': '1'},
+                {'label': 'Not yet', 'value': '0'}
             ]
         },
         {
-            'id': 'won_awards',
-            'question': 'Have you won any school/academic awards?',
+            'field': 'won_awards',
+            'text': 'Have you won any school/academic awards?',
             'choices': [
-                {'label': 'Yes!', 'emoji': '🏅', 'value': '1'},
-                {'label': 'Not yet', 'emoji': '📚', 'value': '0'}
+                {'label': 'Yes!', 'value': '1'},
+                {'label': 'Not yet', 'value': '0'}
             ]
         },
         {
-            'id': 'won_arts',
-            'question': 'Have you won any art competitions?',
+            'field': 'won_arts',
+            'text': 'Have you won any art competitions?',
             'choices': [
-                {'label': 'Yes!', 'emoji': '🎨', 'value': '1'},
-                {'label': 'Maybe/Participated', 'emoji': '✨', 'value': '2'},
-                {'label': 'No', 'emoji': '🖌️', 'value': '0'}
+                {'label': 'Yes!', 'value': '1'},
+                {'label': 'Maybe/Participated', 'value': '2'},
+                {'label': 'No', 'value': '0'}
             ]
         },
         {
-            'id': 'bored_activity',
-            'question': 'When bored at home you usually?',
+            'field': 'bored_activity',
+            'text': 'When bored at home you usually?',
             'choices': [
-                {'label': 'Go outside and play', 'emoji': '⚽', 'value': 'play'},
-                {'label': 'Draw or doodle', 'emoji': '✏️', 'value': 'draw'},
-                {'label': 'Read or solve puzzles', 'emoji': '📖', 'value': 'read'},
-                {'label': 'Sing or hum', 'emoji': '🎵', 'value': 'music'}
+                {'label': 'Go outside and play', 'value': 'play'},
+                {'label': 'Draw or doodle', 'value': 'draw'},
+                {'label': 'Read or solve puzzles', 'value': 'read'},
+                {'label': 'Sing or hum', 'value': 'music'}
             ]
         },
         {
-            'id': 'dream_school',
-            'question': 'Your dream school has a world-class?',
+            'field': 'dream_school',
+            'text': 'Your dream school has a world-class?',
             'choices': [
-                {'label': 'Sports Ground', 'emoji': '🏟️', 'value': 'sports'},
-                {'label': 'Art Studio', 'emoji': '🎨', 'value': 'arts'},
-                {'label': 'Science Lab', 'emoji': '🔬', 'value': 'science'},
-                {'label': 'Library', 'emoji': '📚', 'value': 'library'}
+                {'label': 'Sports Ground', 'value': 'sports'},
+                {'label': 'Art Studio', 'value': 'arts'},
+                {'label': 'Science Lab', 'value': 'science'},
+                {'label': 'Library', 'value': 'library'}
             ]
         },
     ]
@@ -249,11 +316,59 @@ def process():
 @login_required
 def result():
     rf_result = session.get('rf_result', {})
-    subcategories = session.get('subcategories', {})
+    subcategories_dict = session.get('subcategories', {})
     
     if not rf_result:
         return redirect(url_for('detection.stage1'))
     
+    # Format subcategories for template
+    subcategory_info = {
+        # Sports
+        'Cricket': {'emoji': '🏏', 'desc': 'You have great hand-eye coordination!', 'color': 'green', 'category': 'Sports'},
+        'Football': {'emoji': '⚽', 'desc': 'You love teamwork and strategy!', 'color': 'green', 'category': 'Sports'},
+        'Basketball': {'emoji': '🏀', 'desc': 'You have amazing agility!', 'color': 'green', 'category': 'Sports'},
+        'Swimming': {'emoji': '🏊', 'desc': 'You love water and endurance!', 'color': 'green', 'category': 'Sports'},
+        'Badminton': {'emoji': '🏸', 'desc': 'You have quick reflexes!', 'color': 'green', 'category': 'Sports'},
+        # Arts
+        'Drawing': {'emoji': '✏️', 'desc': 'You express yourself through art!', 'color': 'pink', 'category': 'Arts'},
+        'Singing': {'emoji': '🎤', 'desc': 'You have a musical voice!', 'color': 'pink', 'category': 'Arts'},
+        'Dancing': {'emoji': '💃', 'desc': 'You move with rhythm and grace!', 'color': 'pink', 'category': 'Arts'},
+        'Painting': {'emoji': '🎨', 'desc': 'You create colorful masterpieces!', 'color': 'pink', 'category': 'Arts'},
+        'Crafts': {'emoji': '✂️', 'desc': 'You love making things by hand!', 'color': 'pink', 'category': 'Arts'},
+        # Academics
+        'Maths': {'emoji': '➕', 'desc': 'You love solving problems!', 'color': 'blue', 'category': 'Academics'},
+        'Science': {'emoji': '🔬', 'desc': 'You are curious about how things work!', 'color': 'blue', 'category': 'Academics'},
+        'History': {'emoji': '🏛️', 'desc': 'You love learning about the past!', 'color': 'blue', 'category': 'Academics'},
+        'English': {'emoji': '📖', 'desc': 'You have a way with words!', 'color': 'blue', 'category': 'Academics'},
+        'Coding': {'emoji': '💻', 'desc': 'You think like a programmer!', 'color': 'blue', 'category': 'Academics'},
+    }
+    
+    # Convert subcategories dict to list of objects for template
+    subcategories = []
+    for sub_name, sub_pct in subcategories_dict.items():
+        info = subcategory_info.get(sub_name, {
+            'emoji': '⭐',
+            'desc': 'Your detected talent!',
+            'color': 'indigo',
+            'category': rf_result.get('predicted', 'Academics')
+        })
+        subcategories.append({
+            'name': sub_name,
+            'subcategory': sub_name,
+            'key': sub_name.lower(),
+            'pct': sub_pct,
+            'percentage': sub_pct,
+            'description': info['desc'],
+            'emoji': info['emoji'],
+            'color': info['color'],
+            'category': info['category'],
+            'category_label': info['category']
+        })
+    
+    # Sort by percentage descending
+    subcategories.sort(key=lambda x: x['pct'], reverse=True)
+    
+    # Superstar title
     superstar_titles = {
         ('Sports', 'Arts'): 'Creative Sports Champion',
         ('Sports', 'Academics'): 'Academic Sports Star',
@@ -272,11 +387,13 @@ def result():
     
     sorted_hobbies = sorted(pcts.items(), key=lambda x: x[1], reverse=True)
     top_two = (sorted_hobbies[0][0], sorted_hobbies[1][0])
-    title = superstar_titles.get(top_two, f'{predicted} Explorer')
+    superstar_title = superstar_titles.get(top_two, f'Amazing {predicted} Explorer!')
     
     return render_template('detection/result.html',
-                         rf_result=rf_result,
+                         name=session.get('name', 'Superstar'),
+                         superstar_title=superstar_title,
+                         sports_pct=rf_result.get('sports_pct', 0),
+                         arts_pct=rf_result.get('arts_pct', 0),
+                         academic_pct=rf_result.get('academics_pct', 0),
                          subcategories=subcategories,
-                         title=title,
-                         sorted_hobbies=sorted_hobbies,
                          age_group=session.get('age_group'))

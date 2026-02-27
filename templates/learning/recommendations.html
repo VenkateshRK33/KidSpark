@@ -259,37 +259,37 @@
         
         <div class="recommendations-row">
             {% for rec in recommendations[subcategory] %}
-            <div class="recommendation-card {% if rec.locked %}locked{% endif %}">
-                <div class="level-indicator level-{{ rec.level }}">
-                    {{ rec.level }}
+            <div class="recommendation-card {% if rec['locked'] %}locked{% endif %}">
+                <div class="level-indicator level-{{ rec['level'] }}">
+                    {{ rec['level'] }}
                 </div>
                 
-                <div class="card-icon">{{ rec.icon }}</div>
+                <div class="card-icon">{{ rec['icon'] }}</div>
                 
-                <h3 class="card-title">{{ rec.title }}</h3>
+                <h3 class="card-title">{{ rec['title'] }}</h3>
                 
-                <p class="card-description">{{ rec.description }}</p>
+                <p class="card-description">{{ rec['description'] }}</p>
                 
-                <div class="resource-badge badge-{{ rec.resource_type }}">
-                    {% if rec.resource_type == 'activity' %}🎮 Activity
-                    {% elif rec.resource_type == 'video' %}📹 Video
+                <div class="resource-badge badge-{{ rec['resource_type'] }}">
+                    {% if rec['resource_type'] == 'activity' %}🎮 Activity
+                    {% elif rec['resource_type'] == 'video' %}📹 Video
                     {% else %}📋 Project{% endif %}
                 </div>
                 
                 <div class="card-action">
-                    {% if rec.locked %}
+                    {% if rec['locked'] %}
                     <div class="locked-info">
                         <div class="lock-icon">🔒</div>
                         <div class="days-remaining">
-                            {% if rec.days_remaining > 0 %}
-                                {{ rec.days_remaining }} more challenges to unlock
+                            {% if rec['days_remaining'] > 0 %}
+                                {{ rec['days_remaining'] }} more challenges to unlock
                             {% else %}
                                 Complete daily challenges to unlock
                             {% endif %}
                         </div>
                     </div>
                     {% else %}
-                    <a href="{{ url_for('learning.lesson', rec_id=rec.id) }}" class="start-btn">
+                    <a href="{{ url_for('learning.lesson', rec_id=rec.get('id', 0)) }}" class="start-btn">
                         Start Now →
                     </a>
                     {% endif %}

@@ -1,39 +1,143 @@
 {% extends "base.html" %}
-{% block title %}Stage 5 — Almost There!{% endblock %}
-{% block content %}
-<div class="stage-page">
 
-  <div class="stage-dots f1">
-    <div class="stage-dot done">1</div><div class="stage-dot done">2</div>
-    <div class="stage-dot done">3</div><div class="stage-dot done">4</div>
-    <div class="stage-dot active">5</div>
+{% block title %}Stage 5 — Quick Chat!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detection.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="detection-container">
+  <!-- Progress Dots -->
+  <div class="progress-dots">
+    <div class="dot done">1</div>
+    <div class="dot done">2</div>
+    <div class="dot done">3</div>
+    <div class="dot done">4</div>
+    <div class="dot active">5</div>
   </div>
 
-  <div class="stage-title f1">💬 Quick Chat!</div>
-  <div class="stage-subtitle f2">Answer a few quick questions — there are no wrong answers!</div>
+  <!-- Header -->
+  <div class="stage-header-modern">
+    <h1 class="stage-title-modern">💬 Quick Chat!</h1>
+    <p class="stage-subtitle-modern">Answer a few quick questions — there are no wrong answers!</p>
+  </div>
 
-  <form method="POST" action="{{ url_for('detection.stage5') }}" id="stage5Form">
-    <div class="chat-wrap f2" id="chatWrap">
-
+  <!-- Chat Container -->
+  <div class="chat-container-modern">
+    <form method="POST" action="{{ url_for('detection.stage5') }}" id="stage5Form">
+      
       {% for q in questions %}
-      <div class="chat-bubble-item" style="display:none">
-        <div class="chat-bubble-bot">
-          <div class="chat-avatar-bot">🤖</div>
-          <div class="chat-msg-bot">{{ q.text }}</div>
+      <div class="chat-question-modern" data-question="{{ loop.index }}" style="display: none;">
+        <!-- Bot Message -->
+        <div class="chat-message-bot-modern">
+          <div class="chat-avatar-modern">🤖</div>
+          <div class="chat-bubble-modern">{{ q.text }}</div>
         </div>
-        <div class="chat-choices" style="margin-top:10px">
+
+        <!-- Choice Buttons -->
+        <div class="chat-choices-modern">
           {% for choice in q.choices %}
-          <button type="button" class="chat-choice-btn"
+          <button type="button" class="chat-choice-btn-modern"
                   data-field="{{ q.field }}" data-value="{{ choice.value }}">
             {{ choice.label }}
           </button>
           {% endfor %}
         </div>
+
+        <!-- User Response (will be shown after selection) -->
+        <div class="chat-message-user-modern" style="display: none;">
+          <div class="chat-bubble-user-modern"></div>
+          <div class="chat-avatar-modern">😊</div>
+        </div>
       </div>
       {% endfor %}
 
-    </div>
-  </form>
+      <!-- Hidden inputs for answers -->
+      {% for q in questions %}
+      <input type="hidden" name="{{ q.field }}" id="{{ q.field }}Input" value="">
+      {% endfor %}
 
+      <!-- Submit button (shown after all questions) -->
+      <div class="button-container" id="submitContainer" style="display: none;">
+        <button type="submit" class="btn-modern btn-primary-modern">
+          See My Results! 🎉
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
+
+<script>
+(function() {
+  let currentQuestion = 0;
+  const questions = document.querySelectorAll('.chat-question-modern');
+  const totalQuestions = questions.length;
+  const submitContainer = document.getElementById('submitContainer');
+  
+  // Show first question
+  if (questions.length > 0) {
+    setTimeout(() => {
+      questions[0].style.display = 'block';
+      questions[0].style.animation = 'fadeInUp 0.6s ease both';
+    }, 500);
+  }
+  
+  // Handle choice selection
+  document.querySelectorAll('.chat-choice-btn-modern').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const questionDiv = this.closest('.chat-question-modern');
+      const field = this.dataset.field;
+      const value = this.dataset.value;
+      const label = this.textContent;
+      
+      // Store answer
+      const input = document.getElementById(field + 'Input');
+      if (input) {
+        input.value = value;
+      }
+      
+      // Disable all choice buttons in this question
+      const allChoices = questionDiv.querySelectorAll('.chat-choice-btn-modern');
+      allChoices.forEach(choice => {
+        choice.disabled = true;
+        if (choice === this) {
+          choice.classList.add('selected');
+        } else {
+          choice.style.opacity = '0.5';
+        }
+      });
+      
+      // Show user response
+      const userMessage = questionDiv.querySelector('.chat-message-user-modern');
+      const userBubble = questionDiv.querySelector('.chat-bubble-user-modern');
+      userBubble.textContent = label;
+      
+      setTimeout(() => {
+        userMessage.style.display = 'flex';
+        userMessage.style.animation = 'fadeInUp 0.4s ease both';
+      }, 300);
+      
+      // Move to next question or show submit
+      setTimeout(() => {
+        currentQuestion++;
+        
+        if (currentQuestion < totalQuestions) {
+          // Show next question
+          questions[currentQuestion].style.display = 'block';
+          questions[currentQuestion].style.animation = 'fadeInUp 0.6s ease both';
+          
+          // Scroll to new question
+          questions[currentQuestion].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // Show submit button
+          submitContainer.style.display = 'block';
+          submitContainer.style.animation = 'fadeInUp 0.6s ease both';
+          submitContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 800);
+    });
+  });
+})();
+</script>
 {% endblock %}

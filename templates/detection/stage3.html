@@ -1,64 +1,73 @@
 {% extends "base.html" %}
+
 {% block title %}Stage 3 — Quick Fire!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detection.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="stage-page">
-
-  <div class="stage-dots f1">
-    <div class="stage-dot done">1</div>
-    <div class="stage-dot done">2</div>
-    <div class="stage-dot active">3</div>
-    <div class="stage-dot">4</div>
-    <div class="stage-dot">5</div>
+<div class="detection-container">
+  <!-- Progress Dots -->
+  <div class="progress-dots">
+    <div class="dot done">1</div>
+    <div class="dot done">2</div>
+    <div class="dot active">3</div>
+    <div class="dot">4</div>
+    <div class="dot">5</div>
   </div>
 
-  <div style="display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto 16px">
+  <!-- Header with Timer -->
+  <div class="stage-header-modern stage-header-with-timer">
     <div>
-      <div class="stage-title" style="text-align:left;margin-bottom:4px">⚡ Quick Fire!</div>
-      <div class="stage-subtitle" style="text-align:left;margin-bottom:0">Tap everything you love — as fast as you can!</div>
+      <h1 class="stage-title-modern">⚡ Quick Fire!</h1>
+      <p class="stage-subtitle-modern">Tap everything you love — as fast as you can!</p>
     </div>
-    <div>
-      <div id="timerDisplay" class="timer-display" data-duration="{{ 45 if age_group == '5-8' else 30 }}">
-        {{ 45 if age_group == '5-8' else 30 }}
-      </div>
-    </div>
+    <div class="timer-display-modern" id="timerDisplay">30</div>
   </div>
 
+  <!-- Selected Counter -->
+  <div class="selected-counter-modern">
+    Selected: <span id="selectedCount">0</span>
+  </div>
+
+  <!-- Form -->
   <form method="POST" action="{{ url_for('detection.stage3') }}" id="stage3Form">
-
-    <!-- SPORTS ROW -->
-    <div class="stage3-category f2">
-      <div class="stage3-cat-label" style="color:var(--green)">⚽ Sports</div>
-      <div class="stage3-row">
+    
+    <!-- Sports Category -->
+    <div class="category-section-modern">
+      <div class="category-label-modern" style="color: var(--green);">⚽ Sports</div>
+      <div class="hobby-grid-modern">
         {% for item in sports_items %}
-        <div class="tap-card" data-hobby="{{ item.key }}">
-          <span class="tap-emoji">{{ item.emoji }}</span>
-          {{ item.name }}
+        <div class="hobby-card-modern" data-hobby="{{ item.key }}">
+          <div class="hobby-emoji-modern">{{ item.emoji }}</div>
+          <div class="hobby-label-modern">{{ item.name }}</div>
         </div>
         {% endfor %}
       </div>
     </div>
 
-    <!-- ARTS ROW -->
-    <div class="stage3-category f3">
-      <div class="stage3-cat-label" style="color:var(--pink)">🎨 Arts</div>
-      <div class="stage3-row">
+    <!-- Arts Category -->
+    <div class="category-section-modern">
+      <div class="category-label-modern" style="color: var(--pink);">🎨 Arts</div>
+      <div class="hobby-grid-modern">
         {% for item in arts_items %}
-        <div class="tap-card" data-hobby="{{ item.key }}">
-          <span class="tap-emoji">{{ item.emoji }}</span>
-          {{ item.name }}
+        <div class="hobby-card-modern" data-hobby="{{ item.key }}">
+          <div class="hobby-emoji-modern">{{ item.emoji }}</div>
+          <div class="hobby-label-modern">{{ item.name }}</div>
         </div>
         {% endfor %}
       </div>
     </div>
 
-    <!-- ACADEMICS ROW -->
-    <div class="stage3-category f4">
-      <div class="stage3-cat-label" style="color:var(--blue)">📚 Academics</div>
-      <div class="stage3-row">
+    <!-- Academics Category -->
+    <div class="category-section-modern">
+      <div class="category-label-modern" style="color: var(--blue);">📚 Academics</div>
+      <div class="hobby-grid-modern">
         {% for item in academic_items %}
-        <div class="tap-card" data-hobby="{{ item.key }}">
-          <span class="tap-emoji">{{ item.emoji }}</span>
-          {{ item.name }}
+        <div class="hobby-card-modern" data-hobby="{{ item.key }}">
+          <div class="hobby-emoji-modern">{{ item.emoji }}</div>
+          <div class="hobby-label-modern">{{ item.name }}</div>
         </div>
         {% endfor %}
       </div>
@@ -67,11 +76,59 @@
   </form>
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
 <script>
-  const dur = {{ 45 if age_group == '5-8' else 30 }};
-  initTapGrid(dur);
+(function() {
+  const timerDuration = 30;
+  let timeLeft = timerDuration;
+  let selectedItems = [];
+  const timerDisplay = document.getElementById('timerDisplay');
+  const selectedCount = document.getElementById('selectedCount');
+  const form = document.getElementById('stage3Form');
+  
+  // Start timer
+  const timerInterval = setInterval(() => {
+    timeLeft--;
+    timerDisplay.textContent = timeLeft;
+    
+    if (timeLeft <= 10) {
+      timerDisplay.classList.add('warning');
+    }
+    
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      submitForm();
+    }
+  }, 1000);
+  
+  // Card selection
+  document.querySelectorAll('.hobby-card-modern').forEach(card => {
+    card.addEventListener('click', function() {
+      const hobby = this.dataset.hobby;
+      
+      if (this.classList.contains('selected')) {
+        this.classList.remove('selected');
+        selectedItems = selectedItems.filter(item => item !== hobby);
+      } else {
+        this.classList.add('selected');
+        selectedItems.push(hobby);
+      }
+      
+      selectedCount.textContent = selectedItems.length;
+    });
+  });
+  
+  // Submit function
+  function submitForm() {
+    selectedItems.forEach(item => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'tapped_items';
+      input.value = item;
+      form.appendChild(input);
+    });
+    
+    form.submit();
+  }
+})();
 </script>
 {% endblock %}
