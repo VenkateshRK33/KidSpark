@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.lesson_title }} - KidSpark{% endblock %}
+
+{% block extra_css %}
+<style>
+    .lesson-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .lesson-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.1);
+    }
+    
+    .lesson-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .hobby-emoji {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    
+    .subject-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0 5px;
+    }
+    
+    .badge-maths { background: #e3f2fd; color: #1976d2; }
+    .badge-science { background: #e8f5e9; color: #388e3c; }
+    .badge-english { background: #fce4ec; color: #c2185b; }
+    
+    .time-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #fff3e0;
+        color: #f57c00;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 10px 5px;
+    }
+    
+    .lesson-title {
+        font-size: {% if age_group == '5-8' %}2.2rem{% else %}2rem{% endif %};
+        color: #7b1fa2;
+        margin: 20px 0;
+        font-weight: 700;
+    }
+    
+    .lesson-body {
+        font-size: {% if age_group == '5-8' %}18px{% else %}16px{% endif %};
+        line-height: {% if age_group == '5-8' %}2{% else %}1.8{% endif %};
+        color: #333;
+        margin: 25px 0;
+    }
+    
+    .lesson-body p {
+        margin-bottom: 20px;
+    }
+    
+    .example-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 25px 0;
+    }
+    
+    .example-header {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1976d2;
+        margin-bottom: 10px;
+    }
+    
+    .example-text {
+        font-size: {% if age_group == '5-8' %}17px{% else %}15px{% endif %};
+        line-height: 1.7;
+        color: #333;
+    }
+    
+    .fun-fact-box {
+        background: #fff9c4;
+        border-left: 4px solid #fbc02d;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 25px 0;
+    }
+    
+    .fun-fact-header {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #f57f17;
+        margin-bottom: 10px;
+    }
+    
+    .fun-fact-text {
+        font-size: {% if age_group == '5-8' %}17px{% else %}15px{% endif %};
+        line-height: 1.7;
+        color: #333;
+    }
+    
+    .quiz-button {
+        display: block;
+        width: 100%;
+        max-width: 400px;
+        margin: 40px auto 0;
+        padding: 18px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 30px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .quiz-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .progress-indicator {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lesson-container">
+    <div class="lesson-card">
+        <div class="lesson-header">
+            <div class="hobby-emoji">
+                {% if lesson.hobby_context == 'cricket' %}🏏
+                {% elif lesson.hobby_context == 'football' %}⚽
+                {% elif lesson.hobby_context == 'drawing' %}✏️
+                {% elif lesson.hobby_context == 'singing' %}🎤
+                {% elif lesson.hobby_context == 'coding' %}💻
+                {% else %}📚{% endif %}
+            </div>
+            
+            <div>
+                <span class="subject-badge badge-{{ lesson.subject.lower() }}">
+                    {{ lesson.subject }}
+                </span>
+                <span class="time-badge">⏱️ 5 min read</span>
+            </div>
+            
+            <h1 class="lesson-title">{{ lesson.lesson_title }}</h1>
+        </div>
+        
+        <div class="lesson-body">
+            {% for paragraph in lesson.lesson_body.split('\n\n') %}
+                {% if paragraph.strip() %}
+                    <p>{{ paragraph.strip() }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div class="example-box">
+            <div class="example-header">💡 Try This!</div>
+            <div class="example-text">{{ lesson.hobby_example }}</div>
+        </div>
+        
+        <div class="fun-fact-box">
+            <div class="fun-fact-header">⭐ Fun Fact!</div>
+            <div class="fun-fact-text">{{ lesson.fun_fact }}</div>
+        </div>
+        
+        <a href="{{ url_for('learning.quiz', content_id=lesson.content_id) }}" class="quiz-button">
+            I'm Ready for the Quiz! 🎯
+        </a>
+        
+        <div class="progress-indicator">
+            📖 Micro-lesson: Short and focused learning
+        </div>
+    </div>
+</div>
+{% endblock %}

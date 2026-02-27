@@ -1,0 +1,828 @@
+/* ============================================
+   DETECTION GAME STYLES
+   ============================================ */
+
+/* Base Container */
+.detection-container {
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* Stage Backgrounds */
+.stage1-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stage2-bg {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stage3-bg {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+.progress-container {
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fff 0%, #ffd700 100%);
+    border-radius: 20px;
+    width: 0%;
+    transition: width 1s ease-out;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.progress-text {
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+/* ============================================
+   STAGE HEADER
+   ============================================ */
+.stage-header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInDown 0.6s ease-out;
+}
+
+.stage-title {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.stage-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+/* ============================================
+   STAGE 1: CHARACTER CARDS
+   ============================================ */
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    max-width: 900px;
+    margin: 0 auto 30px;
+}
+
+.character-grid.age-5-8 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 35px;
+}
+
+.character-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.card-inner {
+    background: white;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 4px solid transparent;
+}
+
+.character-card:hover .card-inner {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.character-card.selected .card-inner {
+    transform: scale(1.1);
+    border-color: #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+}
+
+.checkmark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: #4caf50;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.character-card.selected .checkmark {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.character-emoji {
+    font-size: 64px;
+    margin-bottom: 15px;
+}
+
+.character-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333;
+}
+
+/* Character Gradients */
+.explorer-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+}
+
+.explorer-gradient .character-name {
+    color: white;
+}
+
+.artist-gradient {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white !important;
+}
+
+.artist-gradient .character-name {
+    color: white;
+}
+
+.athlete-gradient {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white !important;
+}
+
+.athlete-gradient .character-name {
+    color: white;
+}
+
+.scientist-gradient {
+    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+    color: white !important;
+}
+
+.scientist-gradient .character-name {
+    color: white;
+}
+
+.musician-gradient {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    color: #333 !important;
+}
+
+.musician-gradient .character-name {
+    color: #333;
+}
+
+.builder-gradient {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    color: #333 !important;
+}
+
+.builder-gradient .character-name {
+    color: #333;
+}
+
+/* ============================================
+   STAGE 2: SCENARIOS
+   ============================================ */
+.scenario-counter {
+    position: absolute;
+    top: 80px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.scenario-slide {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.scenario-slide.active {
+    display: block;
+}
+
+.scenario-slide.slide-in {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.scenario-slide.slide-out {
+    animation: slideOutLeft 0.5s ease-out;
+}
+
+.scenario-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 40px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.scenario-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.scenario-story {
+    font-size: 1.2rem;
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.choices-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.choice-card {
+    background: white;
+    border: 3px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.choice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.choice-card.selected {
+    border-color: #4caf50;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+    transform: scale(1.05);
+}
+
+.choice-emoji {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.choice-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.next-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.next-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.next-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   STAGE 3: HOBBY TAPPING GAME
+   ============================================ */
+.timer-display {
+    font-size: 4rem;
+    font-weight: 900;
+    color: white;
+    text-align: center;
+    margin: 20px 0;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    transition: color 0.3s ease;
+}
+
+.timer-display.timer-warning {
+    color: #ff4444;
+    animation: pulse 1s infinite;
+}
+
+.selection-counter {
+    text-align: center;
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.selection-counter span {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #ffd700;
+}
+
+.hobby-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    max-width: 1000px;
+    margin: 0 auto 30px;
+}
+
+.hobby-grid.age-5-8 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.hobby-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 3px solid transparent;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.hobby-grid.age-5-8 .hobby-card {
+    padding: 30px 20px;
+}
+
+.hobby-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.hobby-card.selected {
+    background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+    border-color: #4caf50;
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(76, 175, 80, 0.6);
+}
+
+.hobby-card .checkmark {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    background: #4caf50;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.hobby-card.selected .checkmark {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.hobby-emoji {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.hobby-grid.age-5-8 .hobby-emoji {
+    font-size: 56px;
+}
+
+.hobby-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.hobby-grid.age-5-8 .hobby-label {
+    font-size: 1.2rem;
+}
+
+/* Confetti Animation */
+.confetti-pop {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 30px;
+    animation: confettiPop 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes confettiPop {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -70%) scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -100%) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   SUBMIT BUTTON
+   ============================================ */
+.submit-btn {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    margin: 0 auto;
+    display: block;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+}
+
+.submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+    .character-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .character-grid.age-5-8 {
+        grid-template-columns: 1fr;
+    }
+    
+    .stage-title {
+        font-size: 2rem;
+    }
+    
+    .hobby-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .hobby-grid.age-5-8 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .timer-display {
+        font-size: 3rem;
+    }
+    
+    .scenario-counter {
+        top: 70px;
+        right: 15px;
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .detection-container {
+        padding: 15px;
+    }
+    
+    .character-emoji {
+        font-size: 48px;
+    }
+    
+    .hobby-emoji {
+        font-size: 36px;
+    }
+    
+    .choices-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ============================================
+   NEXT BUTTON & SUBMIT BUTTONS
+   ============================================ */
+.next-btn, .submit-btn {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.next-btn:hover:not(:disabled), .submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.next-btn:disabled, .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #ccc;
+}
+
+.next-btn:active:not(:disabled), .submit-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+
+/* ============================================
+   STAGE 2: SCENARIO SLIDES
+   ============================================ */
+.scenario-counter {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Baloo 2', cursive;
+}
+
+.scenario-slide {
+    display: none;
+    width: 100%;
+    max-width: 700px;
+    animation: fadeIn 0.5s ease;
+}
+
+.scenario-slide.active {
+    display: block;
+}
+
+.scenario-slide.slide-out {
+    animation: slideOutLeft 0.4s ease forwards;
+}
+
+.scenario-slide.slide-in {
+    animation: slideInRight 0.4s ease forwards;
+}
+
+.scenario-content {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+}
+
+.scenario-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.scenario-story {
+    font-size: 1.1rem;
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.choices-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.choice-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 3px solid transparent;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.choice-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.choice-card.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.choice-card.selected .choice-emoji {
+    transform: scale(1.2);
+}
+
+.choice-card.selected .choice-label {
+    color: white;
+}
+
+.choice-emoji {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+.choice-label {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* Global scale increase for detection pages */
+.detection-container {
+    font-size: 1.1rem;
+}
+
+.scenario-title {
+    font-size: 2.2rem;
+}
+
+.scenario-story {
+    font-size: 1.2rem;
+}
+
+.choice-emoji {
+    font-size: 4rem;
+}
+
+.choice-label {
+    font-size: 1.35rem;
+}
+
+.character-card h3 {
+    font-size: 1.3rem;
+}
+
+.character-card p {
+    font-size: 1rem;
+}

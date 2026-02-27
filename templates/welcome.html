@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to KidSpark - Discover Your Superpowers!{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to KidSpark ⭐</h1>
+    <p>Discover your superpowers!</p>
+    <div class="hero-buttons">
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Start Adventure 🚀</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Login 🔑</a>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 100%);
+        animation: gradientShift 10s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+</style>
+{% endblock %}

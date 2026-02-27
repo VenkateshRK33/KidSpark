@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}My Badge Collection - KidSpark{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badges-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    
+    .progress-ring-container {
+        display: inline-block;
+        position: relative;
+        margin: 20px 0;
+    }
+    
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring-circle {
+        transition: stroke-dashoffset 0.5s ease;
+    }
+    
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .badge-count {
+        font-size: 1.3rem;
+        color: #666;
+        margin-top: 10px;
+    }
+    
+    .badges-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 40px;
+    }
+    
+    .badge-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .badge-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .badge-card.earned {
+        border: 3px solid #4caf50;
+    }
+    
+    .badge-card.unearned {
+        filter: grayscale(100%);
+        opacity: 0.6;
+    }
+    
+    .lock-overlay {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 2rem;
+    }
+    
+    .badge-icon {
+        font-size: 4rem;
+        margin-bottom: 15px;
+    }
+    
+    .badge-name {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .badge-description {
+        font-size: 1rem;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+    
+    .badge-condition {
+        font-size: 0.9rem;
+        color: #999;
+        font-style: italic;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .earned-date {
+        font-size: 0.85rem;
+        color: #4caf50;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+    
+    .earned-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #4caf50;
+        color: white;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="badges-container">
+    <div class="page-header">
+        <h1 class="page-title">🏆 My Badge Collection</h1>
+        
+        <!-- Progress Ring -->
+        <div class="progress-ring-container">
+            <svg class="progress-ring" width="150" height="150">
+                <circle class="progress-ring-circle"
+                        stroke="#e0e0e0"
+                        stroke-width="10"
+                        fill="transparent"
+                        r="60"
+                        cx="75"
+                        cy="75"/>
+                <circle class="progress-ring-circle"
+                        stroke="#667eea"
+                        stroke-width="10"
+                        fill="transparent"
+                        r="60"
+                        cx="75"
+                        cy="75"
+                        stroke-dasharray="{{ 2 * 3.14159 * 60 }}"
+                        stroke-dashoffset="{{ 2 * 3.14159 * 60 * (1 - earned_count / total_count) }}"
+                        stroke-linecap="round"/>
+            </svg>
+            <div class="progress-text">{{ earned_count }}/{{ total_count }}</div>
+        </div>
+        
+        <div class="badge-count">{{ earned_count }} of {{ total_count }} badges earned</div>
+    </div>
+    
+    <div class="badges-grid">
+        {% for badge in badges %}
+        <div class="badge-card {% if badge.earned %}earned{% else %}unearned{% endif %}">
+            {% if not badge.earned %}
+            <div class="lock-overlay">🔒</div>
+            {% endif %}
+            
+            <div class="badge-icon">{{ badge.icon }}</div>
+            <div class="badge-name">{{ badge.name }}</div>
+            <div class="badge-description">{{ badge.description }}</div>
+            
+            {% if badge.earned %}
+            <div class="earned-badge">✓ Earned</div>
+            {% if badge.earned_date %}
+            <div class="earned-date">{{ badge.earned_date.strftime('%B %d, %Y') }}</div>
+            {% endif %}
+            {% else %}
+            <div class="badge-condition">
+                {% if badge.condition_type == 'hobby_detected' %}
+                    Complete hobby detection
+                {% elif badge.condition_type == 'streak_days' %}
+                    Complete {{ badge.condition_value }} daily challenges
+                {% elif badge.condition_type == 'level_intermediate' %}
+                    Reach intermediate level
+                {% elif badge.condition_type == 'score_improvement' %}
+                    Improve score by {{ badge.condition_value }}%
+                {% elif badge.condition_type == 'multi_hobby' %}
+                    Master {{ badge.condition_value }} hobbies
+                {% else %}
+                    Complete the challenge
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if earned_count > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+    // Fire confetti on page load if badges earned
+    window.addEventListener('load', function() {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

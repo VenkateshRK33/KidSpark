@@ -1,0 +1,536 @@
+{% extends "base.html" %}
+
+{% block title %}Parent Dashboard - KidSpark{% endblock %}
+
+{% block extra_css %}
+<style>
+    .parent-dashboard {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+        min-height: 100vh;
+    }
+    
+    .dashboard-header {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .dashboard-header h1 {
+        margin: 0 0 10px 0;
+        color: #333;
+    }
+    
+    .tab-navigation {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .tab-btn {
+        padding: 12px 24px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        color: #666;
+        transition: all 0.3s;
+    }
+    
+    .tab-btn:hover {
+        color: #667eea;
+    }
+    
+    .tab-btn.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+    }
+    
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 48px;
+        font-weight: bold;
+        color: #667eea;
+        margin: 10px 0;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .chart-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin: 20px 0;
+    }
+    
+    .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .chart-canvas {
+        height: 300px !important;
+        max-width: 100%;
+    }
+    
+    .hobby-table {
+        width: 100%;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin: 20px 0;
+    }
+    
+    .hobby-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .hobby-table th {
+        background: #667eea;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .hobby-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .hobby-table tr:hover {
+        background: #f5f5f5;
+    }
+    
+    .progress-bar-small {
+        width: 100%;
+        height: 10px;
+        background: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 5px;
+        transition: width 1s ease;
+    }
+    
+    .score-badge {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .score-high {
+        background: #c8e6c9;
+        color: #2e7d32;
+    }
+    
+    .score-medium {
+        background: #ffe0b2;
+        color: #e65100;
+    }
+    
+    .score-low {
+        background: #ffcdd2;
+        color: #c62828;
+    }
+    
+    .download-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin: 20px 0;
+        transition: transform 0.2s;
+    }
+    
+    .download-btn:hover {
+        transform: scale(1.05);
+        color: white;
+    }
+    
+    .status-attempted {
+        color: #4caf50;
+        font-weight: 600;
+    }
+    
+    .status-not-yet {
+        color: #999;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 30px 0 15px 0;
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="parent-dashboard">
+    <div class="dashboard-header">
+        <h1>📊 Progress Dashboard - {{ name }}</h1>
+        <p style="color: #666;">Track learning progress, performance, and engagement</p>
+        
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('performance')">Performance</button>
+            <button class="tab-btn" onclick="switchTab('engagement')">Engagement</button>
+            <button class="tab-btn" onclick="switchTab('recommendations')">Recommendations</button>
+        </div>
+    </div>
+    
+    <!-- Overview Tab -->
+    <div id="overview-tab" class="tab-content active">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Active Days</div>
+                <div class="stat-number">{{ stats['active_days'] or 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total XP</div>
+                <div class="stat-number">{{ stats['total_xp'] or 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Badges Earned</div>
+                <div class="stat-number">{{ hobby_history|length }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Quizzes Completed</div>
+                <div class="stat-number">{{ subject_data|sum(attribute='attempts') or 0 }}</div>
+            </div>
+        </div>
+        
+        <div class="section-title">🎯 Hobby Profile</div>
+        <div class="hobby-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hobby</th>
+                        <th>Strength</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hobby in hobby_history %}
+                    <tr>
+                        <td><strong>{{ hobby['subcategory'] }}</strong></td>
+                        <td>{{ hobby['percentage']|int }}%</td>
+                        <td>
+                            <div class="progress-bar-small">
+                                <div class="progress-fill" style="width: {{ hobby['percentage'] }}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Performance Tab -->
+    <div id="performance-tab" class="tab-content">
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3>Subject Performance</h3>
+                <canvas id="subjectChart" class="chart-canvas"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Performance Over Time</h3>
+                <canvas id="improvementChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="section-title">📈 Subject Breakdown</div>
+        <div class="hobby-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Average Score</th>
+                        <th>Attempts</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subj in subject_data %}
+                    <tr>
+                        <td><strong>{{ subj['subject'] }}</strong></td>
+                        <td>{{ subj['avg_pct'] }}%</td>
+                        <td>{{ subj['attempts'] }}</td>
+                        <td>
+                            {% if subj['avg_pct'] >= 70 %}
+                                <span class="score-badge score-high">Excellent</span>
+                            {% elif subj['avg_pct'] >= 50 %}
+                                <span class="score-badge score-medium">Good</span>
+                            {% else %}
+                                <span class="score-badge score-low">Needs Practice</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Engagement Tab -->
+    <div id="engagement-tab" class="tab-content">
+        <div class="chart-container">
+            <h3>Hobby Engagement vs Performance Correlation</h3>
+            <p style="color: #666; margin-bottom: 20px;">
+                This chart shows the relationship between daily challenge completion and assessment scores
+            </p>
+            <canvas id="correlationChart" class="chart-canvas" style="height: 400px !important;"></canvas>
+        </div>
+    </div>
+    
+    <!-- Recommendations Tab -->
+    <div id="recommendations-tab" class="tab-content">
+        <div class="section-title">💡 Recommended Activities</div>
+        <div class="hobby-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Recommended Activity</th>
+                        <th>Subject</th>
+                        <th>Level</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in rec_status %}
+                    <tr>
+                        <td><strong>{{ rec['title'] }}</strong></td>
+                        <td>{{ rec['subcategory'] }}</td>
+                        <td>{{ rec['level'] }}</td>
+                        <td>
+                            {% if rec['attempted'] %}
+                                <span class="status-attempted">✅ Attempted</span>
+                            {% else %}
+                                <span class="status-not-yet">⏳ Not Yet</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="{{ url_for('dashboard.report') }}" target="_blank" class="download-btn">
+            📄 Download Full Report
+        </a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Tab switching
+    function switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        document.getElementById(tabName + '-tab').classList.add('active');
+        event.target.classList.add('active');
+    }
+    
+    // Subject Performance Chart
+    const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+    const subjectLabels = {{ subj_labels|safe }};
+    const subjectData = {{ subj_data|safe }};
+    
+    const subjectColors = subjectData.map(score => {
+        if (score >= 70) return '#4caf50';
+        if (score >= 50) return '#ff9800';
+        return '#f44336';
+    });
+    
+    new Chart(subjectCtx, {
+        type: 'bar',
+        data: {
+            labels: subjectLabels,
+            datasets: [{
+                label: 'Average Score (%)',
+                data: subjectData,
+                backgroundColor: subjectColors,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+    
+    // Improvement Chart (using subject data as timeline)
+    const improvementCtx = document.getElementById('improvementChart').getContext('2d');
+    new Chart(improvementCtx, {
+        type: 'line',
+        data: {
+            labels: subjectLabels,
+            datasets: [{
+                label: 'Performance Trend',
+                data: subjectData,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+    
+    // Correlation Chart
+    const corrCtx = document.getElementById('correlationChart').getContext('2d');
+    const corrLabels = {{ corr_labels|safe }};
+    const corrChallenges = {{ corr_challenges|safe }};
+    const corrScores = {{ corr_scores|safe }};
+    
+    new Chart(corrCtx, {
+        type: 'line',
+        data: {
+            labels: corrLabels,
+            datasets: [
+                {
+                    label: 'Challenges Completed',
+                    data: corrChallenges,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.4
+                },
+                {
+                    label: 'Average Score (%)',
+                    data: corrScores,
+                    borderColor: '#f5576c',
+                    backgroundColor: 'rgba(245, 87, 108, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                title: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Challenges'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Score (%)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

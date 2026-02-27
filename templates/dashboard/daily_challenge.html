@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Challenge - KidSpark{% endblock %}
+
+{% block extra_css %}
+<style>
+    .challenge-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .streak-section {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+    }
+    
+    .streak-emoji {
+        font-size: 4rem;
+        margin-bottom: 10px;
+        animation: flicker 2s ease-in-out infinite;
+    }
+    
+    @keyframes flicker {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .streak-number {
+        font-size: 4rem;
+        font-weight: 700;
+        margin: 10px 0;
+    }
+    
+    .streak-text {
+        font-size: 1.5rem;
+        opacity: 0.9;
+    }
+    
+    .date-badge {
+        display: inline-block;
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 20px;
+        margin-top: 15px;
+        font-size: 1.1rem;
+    }
+    
+    .completed-message {
+        background: #e8f5e9;
+        border-left: 5px solid #4caf50;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 30px 0;
+    }
+    
+    .completed-message h2 {
+        color: #4caf50;
+        margin-bottom: 10px;
+    }
+    
+    .challenge-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .challenge-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .challenge-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .hobby-emoji {
+        font-size: 2.5rem;
+    }
+    
+    .challenge-number {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .xp-badge {
+        margin-left: auto;
+        padding: 8px 16px;
+        background: #fbc02d;
+        color: #333;
+        border-radius: 15px;
+        font-weight: 700;
+    }
+    
+    .question-text {
+        font-size: 1.3rem;
+        color: #333;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+    
+    .answer-input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .answer-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .submit-button {
+        width: 100%;
+        max-width: 400px;
+        display: block;
+        margin: 30px auto 0;
+        padding: 18px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .submit-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .badge-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        z-index: 1000;
+        text-align: center;
+        animation: popIn 0.5s ease forwards;
+    }
+    
+    @keyframes popIn {
+        to {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+    
+    .badge-popup-emoji {
+        font-size: 5rem;
+        margin-bottom: 20px;
+    }
+    
+    .badge-popup-title {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .badge-popup-name {
+        font-size: 1.5rem;
+        color: #667eea;
+        font-weight: 700;
+    }
+    
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="challenge-container">
+    <!-- Streak Section -->
+    <div class="streak-section">
+        <div class="streak-emoji">🔥</div>
+        <div class="streak-number">{{ streak }}</div>
+        <div class="streak-text">{{ streak }} days strong!</div>
+        <div class="date-badge">📅 {{ today.strftime('%B %d, %Y') }}</div>
+    </div>
+    
+    {% set all_completed = challenges|selectattr('completed', 'equalto', 1)|list|length == challenges|length if challenges else false %}
+    
+    {% if all_completed %}
+    <!-- Completed Message -->
+    <div class="completed-message">
+        <h2>🎉 Great Job!</h2>
+        <p style="font-size: 1.2rem; color: #666;">You've completed today's challenges!</p>
+        <p style="font-size: 1rem; color: #999; margin-top: 10px;">Come back tomorrow for new challenges!</p>
+        <a href="{{ url_for('dashboard.kid') }}" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #667eea; color: white; text-decoration: none; border-radius: 20px; font-weight: 600;">
+            Back to Dashboard
+        </a>
+    </div>
+    {% else %}
+    <!-- Challenge Form -->
+    <form method="POST" action="{{ url_for('dashboard.submit_challenge') }}">
+        {% for challenge in challenges %}
+        {% if not challenge.completed %}
+        <div class="challenge-card">
+            <div class="challenge-header">
+                <div class="hobby-emoji">
+                    {% if challenge.hobby_context == 'Cricket' %}🏏
+                    {% elif challenge.hobby_context == 'Football' %}⚽
+                    {% elif challenge.hobby_context == 'Drawing' %}✏️
+                    {% elif challenge.hobby_context == 'Singing' %}🎤
+                    {% elif challenge.hobby_context == 'Maths' %}➕
+                    {% elif challenge.hobby_context == 'Science' %}🔬
+                    {% elif challenge.hobby_context == 'Coding' %}💻
+                    {% elif challenge.hobby_context == 'Dancing' %}💃
+                    {% elif challenge.hobby_context == 'Painting' %}🎨
+                    {% else %}📚{% endif %}
+                </div>
+                <div class="challenge-number">Challenge {{ loop.index }}</div>
+                <div class="xp-badge">+10 XP</div>
+            </div>
+            
+            <div class="question-text">{{ challenge.question_text }}</div>
+            
+            <input type="hidden" name="challenge_id" value="{{ challenge.challenge_id }}">
+            <input type="text" name="answer" class="answer-input" placeholder="Type your answer here..." required>
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        <button type="submit" class="submit-button">
+            Complete Today's Challenge! 🚀
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+<!-- Badge Popup -->
+{% if newly_earned_badges %}
+<div class="popup-overlay" id="badgeOverlay"></div>
+<div class="badge-popup" id="badgePopup">
+    <div class="badge-popup-emoji">🏆</div>
+    <div class="badge-popup-title">New Badge Earned!</div>
+    <div class="badge-popup-name">{{ newly_earned_badges[0] }}</div>
+</div>
+
+<script>
+    // Auto-dismiss badge popup after 3 seconds
+    setTimeout(function() {
+        const popup = document.getElementById('badgePopup');
+        const overlay = document.getElementById('badgeOverlay');
+        if (popup && overlay) {
+            popup.style.animation = 'fadeOut 0.3s ease forwards';
+            overlay.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(function() {
+                popup.remove();
+                overlay.remove();
+            }, 300);
+        }
+    }, 3000);
+</script>
+
+<style>
+    @keyframes fadeOut {
+        to { opacity: 0; }
+    }
+</style>
+{% endif %}
+{% endblock %}

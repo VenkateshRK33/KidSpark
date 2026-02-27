@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Your Personal Recommendations - KidSpark{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    .recommendations-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .unlock-badge {
+        display: inline-block;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        margin: 20px 0;
+    }
+    
+    .unlock-beginner { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); }
+    .unlock-intermediate { background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); }
+    .unlock-advanced { background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%); }
+    
+    .progress-info {
+        font-size: 1rem;
+        color: #666;
+        margin-top: 10px;
+    }
+    
+    .hobby-section {
+        margin-bottom: 50px;
+    }
+    
+    .hobby-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #e0e0e0;
+    }
+    
+    .hobby-emoji {
+        font-size: 2.5rem;
+    }
+    
+    .hobby-name {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+    }
+    
+    .hobby-sports { border-bottom-color: #2196f3; }
+    .hobby-arts { border-bottom-color: #e91e63; }
+    .hobby-academics { border-bottom-color: #4caf50; }
+    
+    .recommendations-row {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+    
+    .recommendation-card {
+        flex: 0 0 300px;
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        border: 2px solid transparent;
+    }
+    
+    .recommendation-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .recommendation-card.locked {
+        opacity: 0.6;
+        background: #f5f5f5;
+    }
+    
+    .recommendation-card.locked::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.1);
+        border-radius: 15px;
+        pointer-events: none;
+    }
+    
+    .card-icon {
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+    
+    .card-description {
+        font-size: 1rem;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+    
+    .resource-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .badge-activity { background: #e3f2fd; color: #1976d2; }
+    .badge-video { background: #fce4ec; color: #c2185b; }
+    .badge-project { background: #e8f5e8; color: #388e3c; }
+    
+    .card-action {
+        text-align: center;
+    }
+    
+    .start-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .start-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .locked-info {
+        text-align: center;
+        color: #999;
+        font-size: 0.9rem;
+    }
+    
+    .lock-icon {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .days-remaining {
+        font-weight: 600;
+        color: #ff9800;
+    }
+    
+    .level-indicator {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 4px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .level-beginner { background: #4caf50; color: white; }
+    .level-intermediate { background: #ff9800; color: white; }
+    .level-advanced { background: #9c27b0; color: white; }
+    
+    @media (max-width: 768px) {
+        .recommendations-row {
+            flex-direction: column;
+        }
+        
+        .recommendation-card {
+            flex: none;
+        }
+        
+        .hobby-header {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recommendations-container">
+    <div class="page-header">
+        <h1 class="page-title">🎯 Your Personal Recommendations</h1>
+        
+        <div class="unlock-badge unlock-{{ unlock_level }}">
+            {{ unlock_level.title() }} Level
+        </div>
+        
+        <div class="progress-info">
+            {% if unlock_level == 'beginner' %}
+                Complete 3 daily challenges to unlock Intermediate level ({{ completed_count }}/3 done)
+            {% elif unlock_level == 'intermediate' %}
+                Complete 7 daily challenges to unlock Advanced level ({{ completed_count }}/7 done)
+            {% else %}
+                All levels unlocked! You're a learning superstar! 🌟
+            {% endif %}
+        </div>
+    </div>
+
+    {% for hobby_row in hobby_rows %}
+    {% set subcategory = hobby_row.subcategory %}
+    {% set category = hobby_row.category %}
+    {% if subcategory in recommendations %}
+    <div class="hobby-section">
+        <div class="hobby-header hobby-{{ category.lower() }}">
+            <div class="hobby-emoji">
+                {% if subcategory == 'Cricket' %}🏏
+                {% elif subcategory == 'Football' %}⚽
+                {% elif subcategory == 'Drawing' %}✏️
+                {% elif subcategory == 'Singing' %}🎤
+                {% elif subcategory == 'Maths' %}➕
+                {% elif subcategory == 'Science' %}🔬
+                {% elif subcategory == 'Coding' %}💻
+                {% elif subcategory == 'Dancing' %}💃
+                {% elif subcategory == 'Painting' %}🎨
+                {% else %}🎯{% endif %}
+            </div>
+            <div>
+                <div class="hobby-name">{{ subcategory }}</div>
+                <div style="color: #666; font-size: 1rem;">{{ hobby_row.percentage }}% match</div>
+            </div>
+        </div>
+        
+        <div class="recommendations-row">
+            {% for rec in recommendations[subcategory] %}
+            <div class="recommendation-card {% if rec.locked %}locked{% endif %}">
+                <div class="level-indicator level-{{ rec.level }}">
+                    {{ rec.level }}
+                </div>
+                
+                <div class="card-icon">{{ rec.icon }}</div>
+                
+                <h3 class="card-title">{{ rec.title }}</h3>
+                
+                <p class="card-description">{{ rec.description }}</p>
+                
+                <div class="resource-badge badge-{{ rec.resource_type }}">
+                    {% if rec.resource_type == 'activity' %}🎮 Activity
+                    {% elif rec.resource_type == 'video' %}📹 Video
+                    {% else %}📋 Project{% endif %}
+                </div>
+                
+                <div class="card-action">
+                    {% if rec.locked %}
+                    <div class="locked-info">
+                        <div class="lock-icon">🔒</div>
+                        <div class="days-remaining">
+                            {% if rec.days_remaining > 0 %}
+                                {{ rec.days_remaining }} more challenges to unlock
+                            {% else %}
+                                Complete daily challenges to unlock
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('learning.lesson', rec_id=rec.id) }}" class="start-btn">
+                        Start Now →
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    
+    {% if not hobby_rows %}
+    <div style="text-align: center; padding: 60px 20px;">
+        <h2>🎯 Complete Your Hobby Detection First!</h2>
+        <p style="font-size: 1.2rem; color: #666; margin: 20px 0;">We need to know your interests to give you personalized recommendations.</p>
+        <a href="{{ url_for('detection.stage1') }}" class="start-btn" style="font-size: 1.2rem; padding: 15px 30px;">
+            Start Hobby Detection →
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

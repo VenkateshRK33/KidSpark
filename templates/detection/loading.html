@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Analyzing... - KidSpark{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+    
+    .loading-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .loading-star {
+        font-size: 8rem;
+        animation: spin 2s linear infinite;
+        margin-bottom: 30px;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .loading-title {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        animation: fadeInOut 2s ease-in-out infinite;
+    }
+    
+    .loading-dots {
+        font-size: 2rem;
+        letter-spacing: 5px;
+    }
+    
+    .loading-dots span {
+        animation: blink 1.4s infinite;
+    }
+    
+    .loading-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .loading-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes blink {
+        0%, 20%, 100% { opacity: 0; }
+        50% { opacity: 1; }
+    }
+    
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+    }
+    
+    .progress-bar-container {
+        width: 80%;
+        max-width: 500px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 40px;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #fff 0%, #ffd700 100%);
+        width: 0%;
+        animation: fillProgress 3s ease-out forwards;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    
+    @keyframes fillProgress {
+        to { width: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="loading-container">
+    <div class="loading-star">⭐</div>
+    <h1 class="loading-title">Discovering Your Superpowers...</h1>
+    <div class="loading-dots">
+        <span>.</span><span>.</span><span>.</span>
+    </div>
+    
+    <div class="progress-bar-container">
+        <div class="progress-bar-fill"></div>
+    </div>
+    
+    <form method="POST" action="{{ url_for('detection.process') }}" id="processForm" style="display: none;">
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit form after 3 seconds (matching progress bar animation)
+    setTimeout(function() {
+        document.getElementById('processForm').submit();
+    }, 3000);
+</script>
+{% endblock %}

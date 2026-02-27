@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Your Results — KidSpark{% endblock %}
+{% block content %}
+
+<!-- CINEMATIC DARK OVERLAY — fades out on load -->
+<div id="resultOverlay" style="position:fixed;inset:0;background:#1e1b4b;z-index:500;display:flex;align-items:center;justify-content:center">
+  <div style="text-align:center;color:white">
+    <div class="loading-star">✨</div>
+    <div style="font-family:'Baloo 2',cursive;font-size:1.4rem;margin-top:16px">Calculating your superpowers...</div>
+  </div>
+</div>
+
+<div id="resultPage" class="page-main" style="text-align:center">
+
+  <!-- CROWN + TITLE -->
+  <span class="result-crown">👑</span>
+  <div class="result-title">{{ superstar_title if superstar_title else 'Amazing Explorer!' }}</div>
+  <div style="color:var(--muted);font-weight:600;font-size:1rem;margin-bottom:32px;animation:fadeUp 0.5s 0.8s both">
+    {{ name }}, you are a true superstar!
+  </div>
+
+  <!-- 3 CIRCULAR RINGS -->
+  <div class="result-rings">
+    <!-- Sports -->
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-track" cx="45" cy="45" r="40"/>
+        <circle class="ring-fill ring-sports" cx="45" cy="45" r="40"
+                data-pct="{{ sports_pct if sports_pct else 0 }}"/>
+      </svg>
+      <div class="ring-label" style="color:var(--green)">⚽ Sports</div>
+      <div class="ring-pct" style="color:var(--green)" data-count="{{ sports_pct if sports_pct else 0 }}">0</div>
+    </div>
+    <!-- Arts -->
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-track" cx="45" cy="45" r="40"/>
+        <circle class="ring-fill ring-arts" cx="45" cy="45" r="40"
+                data-pct="{{ arts_pct if arts_pct else 0 }}"/>
+      </svg>
+      <div class="ring-label" style="color:var(--pink)">🎨 Arts</div>
+      <div class="ring-pct" style="color:var(--pink)" data-count="{{ arts_pct if arts_pct else 0 }}">0</div>
+    </div>
+    <!-- Academics -->
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-track" cx="45" cy="45" r="40"/>
+        <circle class="ring-fill ring-acad" cx="45" cy="45" r="40"
+                data-pct="{{ academic_pct if academic_pct else 0 }}"/>
+      </svg>
+      <div class="ring-label" style="color:var(--blue)">📚 Academics</div>
+      <div class="ring-pct" style="color:var(--blue)" data-count="{{ academic_pct if academic_pct else 0 }}">0</div>
+    </div>
+  </div>
+
+  <!-- SUBCATEGORY ILLUSTRATED MINI CARDS -->
+  {% if subcategories %}
+  <div class="divider"></div>
+  <div class="sec-title" style="margin-bottom:16px">🌟 Your Detected Talents</div>
+  <div class="hobby-row" style="max-width:900px;margin:0 auto 32px">
+    {% for sub in subcategories %}
+    <div class="hobby-card">
+      <div class="hc-scene sc-{{ sub.key if sub.key else sub.subcategory|lower }}">
+        <!-- hobby scene illustration based on hobby type -->
+      </div>
+      <div class="hc-info">
+        <div class="hc-tag hc-tag-{{ sub.category if sub.category else 'sports' }}">{{ sub.category_label if sub.category_label else sub.category }}</div>
+        <div class="hc-name">{{ sub.name if sub.name else sub.subcategory }}</div>
+        <div class="hc-desc">{{ sub.description if sub.description else 'Your detected talent!' }}</div>
+        <div class="hc-pct">
+          <div class="hc-bar-track">
+            <div class="hc-bar-fill prog-fill-{{ sub.color if sub.color else 'green' }}" data-width="{{ sub.pct if sub.pct else sub.percentage }}" style="width:0%"></div>
+          </div>
+          <div class="hc-pct-num" style="color:var(--{{ sub.color if sub.color else 'green' }})">{{ sub.pct if sub.pct else sub.percentage }}%</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- CTAs -->
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+    <a href="{{ url_for('learning.recommendations') }}" class="btn btn-primary btn-lg">🚀 See My Recommendations</a>
+    <a href="{{ url_for('dashboard.kid') }}" class="btn btn-rose btn-lg">🏠 Go to Dashboard</a>
+  </div>
+
+</div>
+{% endblock %}

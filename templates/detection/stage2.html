@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Your Choices - KidSpark{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detection.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="detection-container stage2-bg">
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" data-progress="40">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">Step 2 of 5</div>
+    </div>
+
+    <!-- Scenario Counter -->
+    <div class="scenario-counter">
+        <span id="currentScenario">1</span> of {{ scenarios|length }}
+    </div>
+
+    <!-- Scenarios Form -->
+    <form method="POST" action="{{ url_for('detection.stage2') }}" id="stage2Form">
+        {% for scenario in scenarios %}
+        <div class="scenario-slide {% if loop.first %}active{% endif %}" data-scenario="{{ loop.index }}">
+            <div class="scenario-content">
+                <h2 class="scenario-title">{{ scenario.title }}</h2>
+                {% if age_group != '5-8' %}
+                <p class="scenario-story">{{ scenario.story }}</p>
+                {% endif %}
+
+                <div class="choices-grid">
+                    {% for choice in scenario.choices %}
+                    <div class="choice-card" data-field="{{ choice.field }}" data-value="{{ choice.value }}">
+                        <div class="choice-emoji">{{ choice.emoji }}</div>
+                        <div class="choice-label">{{ choice.label }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if not loop.last %}
+            <button type="button" class="next-btn" disabled>Next →</button>
+            {% else %}
+            <button type="submit" class="submit-btn" disabled>Complete →</button>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Hidden inputs for all answers -->
+        <input type="hidden" name="treasure" id="treasureInput" value="">
+        <input type="hidden" name="career_sports" id="career_sportsInput" value="">
+        <input type="hidden" name="fav_subject" id="fav_subjectInput" value="">
+        <input type="hidden" name="tv_choice" id="tv_choiceInput" value="">
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/detection.js') }}"></script>
+<script>
+    console.log('Stage 2 initializing with', {{ scenarios|length }}, 'scenarios');
+    initStage2({{ scenarios|length }});
+    
+    // Debug: Check if buttons exist
+    console.log('Next buttons found:', document.querySelectorAll('.next-btn').length);
+    console.log('Submit buttons found:', document.querySelectorAll('.submit-btn').length);
+    
+    // Debug: Log form submission
+    const form = document.getElementById('stage2Form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            console.log('✅ Form submitting with values:');
+            console.log('treasure:', document.getElementById('treasureInput').value);
+            console.log('career_sports:', document.getElementById('career_sportsInput').value);
+            console.log('fav_subject:', document.getElementById('fav_subjectInput').value);
+            console.log('tv_choice:', document.getElementById('tv_choiceInput').value);
+            
+            // Don't prevent default - let it submit
+        });
+    } else {
+        console.error('❌ Form not found!');
+    }
+    
+    // Force enable submit button after 2 seconds for testing
+    setTimeout(() => {
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+            console.log('Force enabling submit button for testing');
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.cursor = 'pointer';
+        }
+    }, 2000);
+</script>
+{% endblock %}

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KidSpark Progress Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .report-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .report-header {
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .generated-date {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin: 30px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+        
+        .score-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-block;
+        }
+        
+        .score-high {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .score-medium {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+        
+        .score-low {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+        
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: #f5f5f5;
+            border-radius: 20px;
+        }
+        
+        .badge-icon {
+            font-size: 24px;
+        }
+        
+        .badge-name {
+            font-weight: 600;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        
+        .print-btn:hover {
+            opacity: 0.9;
+        }
+        
+        @media print {
+            .print-btn {
+                display: none;
+            }
+            
+            .section {
+                page-break-before: auto;
+                page-break-after: auto;
+                page-break-inside: avoid;
+            }
+            
+            body {
+                background: white;
+            }
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            text-align: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+        </div>
+        
+        <div class="report-header">
+            <div class="logo">🌟 KidSpark</div>
+            <h2>Student Progress Report</h2>
+            <div class="generated-date">Generated on {{ generated_on.strftime('%B %d, %Y') }}</div>
+        </div>
+        
+        <!-- Student Information -->
+        <div class="section">
+            <div class="section-title">👤 Student Information</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Name</div>
+                    <div class="info-value">{{ user['name'] }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Age</div>
+                    <div class="info-value">{{ user['age'] }} years</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Class</div>
+                    <div class="info-value">{{ user['class_name'] or 'N/A' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Age Group</div>
+                    <div class="info-value">{{ user['age_group'] }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Summary -->
+        <div class="section">
+            <div class="section-title">📊 Activity Summary</div>
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-number">{{ hobbies|length }}</div>
+                    <div class="stat-label">Hobbies Detected</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">{{ challenges_done }}</div>
+                    <div class="stat-label">Challenges Completed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">{{ earned_badges|length }}</div>
+                    <div class="stat-label">Badges Earned</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hobby Profile -->
+        <div class="section">
+            <div class="section-title">🎯 Hobby Profile</div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Hobby</th>
+                        <th>Strength</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hobby in hobbies %}
+                    <tr>
+                        <td><strong>{{ hobby['subcategory'] }}</strong></td>
+                        <td>{{ hobby['percentage']|int }}%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ hobby['percentage'] }}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Performance -->
+        <div class="section">
+            <div class="section-title">📈 Academic Performance</div>
+            {% if perf %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Average Score</th>
+                        <th>Performance Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in perf %}
+                    <tr>
+                        <td><strong>{{ p['subject'] }}</strong></td>
+                        <td>{{ p['avg_pct'] }}%</td>
+                        <td>
+                            {% if p['avg_pct'] >= 70 %}
+                                <span class="score-badge score-high">Excellent</span>
+                            {% elif p['avg_pct'] >= 50 %}
+                                <span class="score-badge score-medium">Good</span>
+                            {% else %}
+                                <span class="score-badge score-low">Needs Practice</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #666; padding: 20px; text-align: center;">No assessment data available yet.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Badges Earned -->
+        <div class="section">
+            <div class="section-title">🏆 Badges Earned</div>
+            {% if earned_badges %}
+            <div class="badge-list">
+                {% for badge in earned_badges %}
+                <div class="badge-item">
+                    <div class="badge-icon">{{ badge['icon'] }}</div>
+                    <div class="badge-name">{{ badge['name'] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: #666; padding: 20px; text-align: center;">No badges earned yet. Keep learning!</p>
+            {% endif %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Generated by KidSpark</strong></p>
+            <p>AI-Powered Hobby Detection & Personalized Learning Platform</p>
+            <p style="margin-top: 10px; font-size: 12px;">Internship Project - 2026</p>
+        </div>
+    </div>
+</body>
+</html>

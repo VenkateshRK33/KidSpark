@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Quiz — KidSpark{% endblock %}
+{% block content %}
+<div class="page-main" style="max-width:1000px">
+
+  <!-- PROGRESS DOTS -->
+  <div class="quiz-top" style="background:transparent;border:none;margin-bottom:20px;padding:0">
+    <span class="q-label">Q<span id="qNum">1</span> of {{ questions|length }}</span>
+    {% for q in questions %}
+    <div class="q-dot {{ 'active' if loop.first else '' }}"></div>
+    {% endfor %}
+  </div>
+
+  <form method="POST" action="{{ url_for('learning.submit_quiz', content_id=content_id) }}" id="quizSubmitForm">
+
+    {% for question in questions %}
+    <div class="question-block quiz-wrap" style="display:{{ 'block' if loop.first else 'none' }}">
+      <div class="quiz-body">
+
+        <!-- LEFT: illustrated scene + question -->
+        <div class="quiz-left">
+          <div class="quiz-scene" style="background:linear-gradient(135deg,{{ question.bg_gradient if question.bg_gradient else 'var(--green-l),#a7f3d0' }})">
+            <div class="quiz-scene-icon">{{ question.hobby_emoji if question.hobby_emoji else '📚' }}</div>
+            <div class="quiz-scene-chip" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.28);color:#065f46">
+              {{ question.subject_tag if question.subject_tag else '📚 General' }}
+            </div>
+          </div>
+          <div class="q-num">Question {{ loop.index }}</div>
+          <div class="q-text">{{ question.question_text }}</div>
+        </div>
+
+        <!-- RIGHT: answer options -->
+        <div class="quiz-right">
+          {% set options = [('A', question.option_a), ('B', question.option_b), ('C', question.option_c), ('D', question.option_d)] %}
+          {% for letter, text in options %}
+          <button type="button" class="q-ans"
+                  data-correct="{{ 'true' if letter == question.correct_answer else 'false' }}"
+                  data-option="{{ letter }}">
+            <span class="ans-letter">{{ letter }}</span>
+            {{ text }}
+          </button>
+          {% endfor %}
+
+          <!-- Explanation (shows after wrong answer) -->
+          <div class="explanation-box">
+            💡 {{ question.explanation if question.explanation else 'Great try! The correct answer is highlighted above.' }}
+          </div>
+
+          <!-- Next button (hidden until answered) -->
+          <button type="button" class="btn btn-primary next-q-btn" style="display:none;margin-top:8px">
+            {% if loop.last %}See Results 🎉{% else %}Next Question →{% endif %}
+          </button>
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+
+  </form>
+</div>
+{% endblock %}

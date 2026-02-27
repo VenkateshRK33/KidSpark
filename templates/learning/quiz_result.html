@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results - KidSpark{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .result-card {
+        background: white;
+        border-radius: 20px;
+        padding: 50px 40px;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .celebration-emoji {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        animation: bounce 1s ease infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .result-message {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: {{ msg[2] }};
+        margin-bottom: 10px;
+    }
+    
+    .result-submessage {
+        font-size: 1.3rem;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    
+    .score-display {
+        font-size: 4rem;
+        font-weight: 700;
+        color: #333;
+        margin: 30px 0;
+    }
+    
+    .stars-container {
+        font-size: 3rem;
+        margin: 20px 0;
+    }
+    
+    .star-filled {
+        color: #fbc02d;
+    }
+    
+    .star-empty {
+        color: #e0e0e0;
+    }
+    
+    .xp-earned {
+        display: inline-block;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 25px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin: 20px 0;
+    }
+    
+    .lesson-info {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 30px 0;
+    }
+    
+    .lesson-title {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 30px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-align: center;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+    
+    .btn-warning {
+        background: #ff9800;
+        color: white;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        text-decoration: none;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        color: #667eea;
+    }
+    
+    .encouragement-box {
+        background: #fff3e0;
+        border-left: 4px solid #ff9800;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+    }
+    
+    .encouragement-text {
+        font-size: 1.1rem;
+        color: #333;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    <div class="result-card">
+        <div class="celebration-emoji">
+            {% if msg[2] == 'green' %}🎉
+            {% elif msg[2] == 'blue' %}👍
+            {% else %}💪{% endif %}
+        </div>
+        
+        <h1 class="result-message">{{ msg[0] }}</h1>
+        <p class="result-submessage">{{ msg[1] }}</p>
+        
+        <div class="score-display">{{ score }}/{{ total }}</div>
+        
+        <div class="stars-container">
+            {% for i in range(total) %}
+                {% if i < score %}
+                    <span class="star-filled">⭐</span>
+                {% else %}
+                    <span class="star-empty">⭐</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div class="xp-earned">
+            +{{ xp_earned }} XP Earned! 🏆
+        </div>
+        
+        <div class="lesson-info">
+            <div class="lesson-title">{{ lesson.lesson_title }}</div>
+            <div style="color: #666;">{{ lesson.subject }} • Attempt #{{ attempt }}</div>
+        </div>
+        
+        {% if score < total * 0.6 %}
+        <div class="encouragement-box">
+            <div class="encouragement-text">
+                <strong>💡 Learning Tip:</strong> Don't worry! Learning takes practice. 
+                Try reviewing the lesson again, or explore a different hobby context for the same concept. 
+                Every attempt makes you stronger!
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('learning.learning_path') }}" class="btn btn-primary">
+                Back to My Learning Path 📚
+            </a>
+            
+            <a href="{{ url_for('learning.quiz', content_id=content_id) }}" class="btn btn-secondary">
+                Try Again 🔄
+            </a>
+            
+            {% if score < total * 0.6 %}
+            <a href="{{ url_for('learning.learning_path') }}" class="btn btn-warning">
+                Try a Different Approach 🎯
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

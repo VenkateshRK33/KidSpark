@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Join KidSpark - Start Your Adventure!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card register-card">
+        <div class="card-header">
+            <div class="emoji-icon">🎨</div>
+            <h2>Join the Adventure!</h2>
+            <p class="card-subtitle">Tell us about yourself</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+            <div class="form-group">
+                <label for="name">👤 Your Name</label>
+                <input type="text" id="name" name="name" required placeholder="Enter your name">
+            </div>
+            
+            <div class="form-group">
+                <label for="age">🎂 Your Age</label>
+                <input type="number" id="age" name="age" min="5" max="14" required placeholder="How old are you?" onchange="updateAgeGroup()">
+                <div id="age-group-badge" class="age-badge"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="class_name">📚 Your Class</label>
+                <input type="text" id="class_name" name="class_name" required placeholder="e.g., 5th Grade">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">📧 Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">🔒 Create Password</label>
+                <input type="password" id="password" name="password" required minlength="6" placeholder="At least 6 characters">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">✅ Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="6" placeholder="Type password again">
+            </div>
+            
+            <button type="submit" class="btn btn-submit">
+                Start My Adventure! 🚀
+            </button>
+        </form>
+        
+        <p class="auth-footer">
+            Already a superstar? <a href="{{ url_for('auth.login') }}">Login here</a>
+        </p>
+    </div>
+</div>
+
+<script>
+function updateAgeGroup() {
+    const age = parseInt(document.getElementById('age').value);
+    const badge = document.getElementById('age-group-badge');
+    
+    if (age >= 5 && age <= 8) {
+        badge.innerHTML = '🌱 Little Explorer (5-8)';
+        badge.className = 'age-badge age-badge-green';
+        badge.style.display = 'block';
+    } else if (age >= 9 && age <= 12) {
+        badge.innerHTML = '🎯 Adventure Seeker (9-12)';
+        badge.className = 'age-badge age-badge-blue';
+        badge.style.display = 'block';
+    } else if (age >= 13 && age <= 14) {
+        badge.innerHTML = '🏆 Teen Champion (13-14)';
+        badge.className = 'age-badge age-badge-purple';
+        badge.style.display = 'block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

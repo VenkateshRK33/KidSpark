@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Stage 1 — Choose Your Character{% endblock %}
+{% block content %}
+<div class="stage-page">
+
+  <!-- STEP DOTS -->
+  <div class="stage-dots f1">
+    <div class="stage-dot active">1</div>
+    <div class="stage-dot">2</div>
+    <div class="stage-dot">3</div>
+    <div class="stage-dot">4</div>
+    <div class="stage-dot">5</div>
+  </div>
+
+  <div class="stage-title f1">✨ Choose Your Character!</div>
+  <div class="stage-subtitle f2">Who are you? Pick the one that feels most like you!</div>
+
+  <form method="POST" action="{{ url_for('detection.stage1') }}" id="stage1Form">
+    <input type="hidden" name="avatar" id="avatarInput" value="">
+    <div class="avatars-grid f2">
+
+      <div class="av-card" data-value="explorer">
+        <div class="av-circle av-explorer">
+          <div class="av-hair"></div><div class="av-head"></div>
+          <div class="av-eye l"></div><div class="av-eye r"></div>
+          <div class="av-smile"></div><div class="av-body"></div>
+        </div>
+        <div class="av-name">Explorer</div>
+        <div class="av-role">🧭 I love discovering!</div>
+      </div>
+
+      <div class="av-card" data-value="artist">
+        <div class="av-circle av-artist">
+          <div class="av-hair"></div><div class="av-head"></div>
+          <div class="av-eye l"></div><div class="av-eye r"></div>
+          <div class="av-smile"></div><div class="av-body"></div>
+        </div>
+        <div class="av-name">Artist</div>
+        <div class="av-role">🎨 I love creating!</div>
+      </div>
+
+      <div class="av-card" data-value="athlete">
+        <div class="av-circle av-athlete">
+          <div class="av-hair"></div><div class="av-head"></div>
+          <div class="av-eye l"></div><div class="av-eye r"></div>
+          <div class="av-smile"></div><div class="av-body"></div>
+        </div>
+        <div class="av-name">Athlete</div>
+        <div class="av-role">🏅 I love winning!</div>
+      </div>
+
+      <div class="av-card" data-value="scientist">
+        <div class="av-circle av-scientist">
+          <div class="av-hair"></div><div class="av-head"></div>
+          <div class="av-eye l"></div><div class="av-eye r"></div>
+          <div class="av-smile"></div><div class="av-body"></div>
+        </div>
+        <div class="av-name">Scientist</div>
+        <div class="av-role">🔬 I love experiments!</div>
+      </div>
+
+      <div class="av-card" data-value="musician">
+        <div class="av-circle av-musician">
+          <div class="av-hair"></div><div class="av-head"></div>
+          <div class="av-eye l"></div><div class="av-eye r"></div>
+          <div class="av-smile"></div><div class="av-body"></div>
+        </div>
+        <div class="av-name">Musician</div>
+        <div class="av-role">🎵 I love music!</div>
+      </div>
+
+      <div class="av-card" data-value="builder">
+        <div class="av-circle av-builder">
+          <div class="av-hair"></div><div class="av-head"></div>
+          <div class="av-eye l"></div><div class="av-eye r"></div>
+          <div class="av-smile"></div><div class="av-body"></div>
+        </div>
+        <div class="av-name">Builder</div>
+        <div class="av-role">🔧 I love building!</div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <button type="submit" class="btn btn-primary btn-lg av-submit-btn" disabled>
+        That's Me! Continue →
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Login to KidSpark{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card login-card">
+        <div class="card-header">
+            <div class="emoji-icon">👋</div>
+            <h2>Welcome Back!</h2>
+            <p class="card-subtitle">Continue your journey</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
+            <div class="form-group">
+                <label for="email">📧 Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">🔒 Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember_me">
+                    <span>Remember me</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-submit">
+                Let's Go! 🎯
+            </button>
+        </form>
+        
+        <p class="auth-footer">
+            New here? <a href="{{ url_for('auth.register') }}">Join the adventure!</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

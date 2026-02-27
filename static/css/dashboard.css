@@ -1,0 +1,259 @@
+/* Dashboard and Learning Recommendations Styles */
+
+/* Dashboard Styles */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.welcome-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.welcome-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.dashboard-card h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.dashboard-card p {
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Recommendation Card Grid */
+.recommendation-card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.recommendation-card {
+    flex: 1;
+    min-width: 280px;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.recommendation-card.locked {
+    opacity: 0.6;
+    background: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.recommendation-card.locked::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.05);
+    border-radius: 15px;
+    pointer-events: none;
+}
+
+/* Unlock Progress Bar */
+.unlock-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.unlock-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50 0%, #45a049 100%);
+    transition: width 0.3s ease;
+}
+
+/* Hobby Section Headers */
+.hobby-section-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 40px 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #e0e0e0;
+}
+
+.hobby-section-header.sports {
+    border-bottom-color: #2196f3;
+}
+
+.hobby-section-header.arts {
+    border-bottom-color: #e91e63;
+}
+
+.hobby-section-header.academics {
+    border-bottom-color: #4caf50;
+}
+
+.hobby-emoji {
+    font-size: 2.5rem;
+}
+
+.hobby-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+/* Level Badges */
+.level-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.level-badge.beginner {
+    background: #4caf50;
+    color: white;
+}
+
+.level-badge.intermediate {
+    background: #ff9800;
+    color: white;
+}
+
+.level-badge.advanced {
+    background: #9c27b0;
+    color: white;
+}
+
+/* Card Hover Animation */
+.card-hover-lift {
+    transition: all 0.3s ease;
+}
+
+.card-hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .recommendation-card-grid {
+        flex-direction: column;
+    }
+    
+    .recommendation-card {
+        min-width: auto;
+    }
+    
+    .hobby-section-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .welcome-section h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 20px 15px;
+    }
+    
+    .welcome-section {
+        padding: 30px 20px;
+    }
+    
+    .dashboard-card {
+        padding: 20px;
+    }
+}
+
+
+/* Global scale increase for dashboard */
+.dashboard-container {
+    font-size: 1.05rem;
+}
+
+.dashboard-card h2 {
+    font-size: 1.65rem;
+}
+
+.dashboard-card p {
+    font-size: 1.05rem;
+}
+
+.recommendation-card {
+    font-size: 1.05rem;
+}
+
+.hobby-name {
+    font-size: 2.2rem;
+}

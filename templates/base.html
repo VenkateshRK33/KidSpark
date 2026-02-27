@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}KidSpark{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+{% block extra_css %}{% endblock %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.0/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<!-- SUBTLE DOT PATTERN OVERLAY -->
+<div class="bg-dots"></div>
+
+{% if session.user_id %}
+<!-- FLOATING NAVBAR -->
+<nav class="navbar">
+  <!-- LOGO: puzzle piece letters + cartoon hands -->
+  <a class="logo" href="{{ url_for('dashboard.kid') }}">
+    <span class="hand hand-l">🤜</span>
+    <div class="puzzle">
+      <div class="pl p0">K</div>
+      <div class="pl p1">i</div>
+      <div class="pl p2">d</div>
+      <div class="pl p3">S</div>
+      <div class="pl p4">p</div>
+      <div class="pl p5">a</div>
+      <div class="pl p6">r</div>
+      <div class="pl p7">k</div>
+    </div>
+    <span class="hand hand-r">🤛</span>
+  </a>
+
+  <!-- NAV LINKS -->
+  <ul class="nav-links">
+    <li>
+      <a href="{{ url_for('dashboard.kid') }}"
+         class="{{ 'active' if request.endpoint == 'dashboard.kid' }}">
+        🏠 Home
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('learning.recommendations') }}"
+         class="{{ 'active' if 'learning' in request.endpoint }}">
+        📚 My Learning
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('performance.progress') }}"
+         class="{{ 'active' if 'performance' in request.endpoint }}">
+        📊 My Progress
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('dashboard.daily_challenge') }}"
+         class="{{ 'active' if request.endpoint == 'dashboard.daily_challenge' }}">
+        ⚡ Daily Challenge
+      </a>
+    </li>
+  </ul>
+
+  <!-- NAV RIGHT: streak + XP + avatar + logout -->
+  <div class="nav-right">
+    <div class="nav-pill fire">🔥 {{ session.get('streak', 0) }}</div>
+    <div class="nav-pill xp">⭐ {{ session.get('total_xp', 0) }} XP</div>
+    <div class="nav-avatar">{{ session.get('name', 'U')[0].upper() }}</div>
+    <a href="{{ url_for('auth.logout') }}" class="btn-logout">Logout</a>
+  </div>
+</nav>
+{% endif %}
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- PAGE CONTENT -->
+<main class="page-main">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- BADGE TOAST NOTIFICATION -->
+<div id="badgeToast" class="badge-toast">
+  <div class="badge-toast-icon" id="toastIcon">🏆</div>
+  <div class="badge-toast-text">
+    <strong>Badge Earned!</strong>
+    <span id="toastName">Amazing!</span>
+  </div>
+</div>
+
+<!-- XP FLOAT CONTAINER -->
+<div id="xpFloatContainer"></div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

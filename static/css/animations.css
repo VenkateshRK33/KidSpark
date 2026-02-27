@@ -1,0 +1,194 @@
+/* ══════════════════════════════════════
+   KIDSPARK ANIMATIONS & MICRO-INTERACTIONS
+══════════════════════════════════════ */
+
+/* ── Ripple effect keyframes ── */
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ── Puzzle letter hover animations ── */
+@keyframes puzzleBounce {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+  50% { transform: translateY(-8px) scale(1.28) rotate(7deg); }
+}
+
+/* ── Badge float animation ── */
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ── Badge glow pulse ── */
+@keyframes badgeGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.7); }
+}
+
+/* ── XP float up animation ── */
+@keyframes xpFloat {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+}
+
+/* ── Shimmer sweep effect ── */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ── Progress bar fill animation ── */
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: var(--target-width); }
+}
+
+/* ── Fade animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+/* ── Avatar idle animation ── */
+@keyframes avIdle {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* ── Button hover effects ── */
+@keyframes buttonHover {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+/* ── Dot pattern animation ── */
+@keyframes dotFloat {
+  0%, 100% { opacity: 0.1; transform: translateY(0); }
+  50% { opacity: 0.3; transform: translateY(-2px); }
+}
+
+/* ── Badge toast slide in ── */
+@keyframes toastSlideIn {
+  0% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes toastSlideOut {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* ── Apply animations to elements ── */
+.xp-float {
+  position: fixed;
+  pointer-events: none;
+  font-weight: 700;
+  color: #fbbf24;
+  font-size: 1.1rem;
+  z-index: 1000;
+  animation: xpFloat 1.6s ease-out forwards;
+}
+
+.badge-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.badge-toast.show {
+  animation: toastSlideIn 0.4s ease forwards;
+}
+
+.badge-toast-icon {
+  font-size: 2rem;
+  animation: badgeFloat 2s ease-in-out infinite;
+}
+
+.badge-toast-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.badge-toast-text strong {
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.badge-toast-text span {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* ── Hover effects ── */
+.btn:hover {
+  animation: buttonHover 0.2s ease forwards;
+}
+
+.pl:hover {
+  animation: puzzleBounce 0.4s ease;
+  cursor: pointer;
+}
+
+/* ── Progress bar animations ── */
+.prog-fill {
+  transition: width 1.5s ease-out;
+}
+
+/* ── Shimmer effect ── */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+/* ── Card hover lift ── */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+/* ── Staggered fade animations ── */
+.f1 { animation: fadeUp 0.6s ease 0.1s both; }
+.f2 { animation: fadeUp 0.6s ease 0.2s both; }
+.f3 { animation: fadeUp 0.6s ease 0.3s both; }
+.f4 { animation: fadeUp 0.6s ease 0.4s both; }
+.f5 { animation: fadeUp 0.6s ease 0.5s both; }

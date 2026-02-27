@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Stage 3 — Quick Fire!{% endblock %}
+{% block content %}
+<div class="stage-page">
+
+  <div class="stage-dots f1">
+    <div class="stage-dot done">1</div>
+    <div class="stage-dot done">2</div>
+    <div class="stage-dot active">3</div>
+    <div class="stage-dot">4</div>
+    <div class="stage-dot">5</div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto 16px">
+    <div>
+      <div class="stage-title" style="text-align:left;margin-bottom:4px">⚡ Quick Fire!</div>
+      <div class="stage-subtitle" style="text-align:left;margin-bottom:0">Tap everything you love — as fast as you can!</div>
+    </div>
+    <div>
+      <div id="timerDisplay" class="timer-display" data-duration="{{ 45 if age_group == '5-8' else 30 }}">
+        {{ 45 if age_group == '5-8' else 30 }}
+      </div>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('detection.stage3') }}" id="stage3Form">
+
+    <!-- SPORTS ROW -->
+    <div class="stage3-category f2">
+      <div class="stage3-cat-label" style="color:var(--green)">⚽ Sports</div>
+      <div class="stage3-row">
+        {% for item in sports_items %}
+        <div class="tap-card" data-hobby="{{ item.key }}">
+          <span class="tap-emoji">{{ item.emoji }}</span>
+          {{ item.name }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ARTS ROW -->
+    <div class="stage3-category f3">
+      <div class="stage3-cat-label" style="color:var(--pink)">🎨 Arts</div>
+      <div class="stage3-row">
+        {% for item in arts_items %}
+        <div class="tap-card" data-hobby="{{ item.key }}">
+          <span class="tap-emoji">{{ item.emoji }}</span>
+          {{ item.name }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ACADEMICS ROW -->
+    <div class="stage3-category f4">
+      <div class="stage3-cat-label" style="color:var(--blue)">📚 Academics</div>
+      <div class="stage3-row">
+        {% for item in academic_items %}
+        <div class="tap-card" data-hobby="{{ item.key }}">
+          <span class="tap-emoji">{{ item.emoji }}</span>
+          {{ item.name }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const dur = {{ 45 if age_group == '5-8' else 30 }};
+  initTapGrid(dur);
+</script>
+{% endblock %}

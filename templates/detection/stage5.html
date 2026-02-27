@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Stage 5 — Almost There!{% endblock %}
+{% block content %}
+<div class="stage-page">
+
+  <div class="stage-dots f1">
+    <div class="stage-dot done">1</div><div class="stage-dot done">2</div>
+    <div class="stage-dot done">3</div><div class="stage-dot done">4</div>
+    <div class="stage-dot active">5</div>
+  </div>
+
+  <div class="stage-title f1">💬 Quick Chat!</div>
+  <div class="stage-subtitle f2">Answer a few quick questions — there are no wrong answers!</div>
+
+  <form method="POST" action="{{ url_for('detection.stage5') }}" id="stage5Form">
+    <div class="chat-wrap f2" id="chatWrap">
+
+      {% for q in questions %}
+      <div class="chat-bubble-item" style="display:none">
+        <div class="chat-bubble-bot">
+          <div class="chat-avatar-bot">🤖</div>
+          <div class="chat-msg-bot">{{ q.text }}</div>
+        </div>
+        <div class="chat-choices" style="margin-top:10px">
+          {% for choice in q.choices %}
+          <button type="button" class="chat-choice-btn"
+                  data-field="{{ q.field }}" data-value="{{ choice.value }}">
+            {{ choice.label }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+  </form>
+
+</div>
+{% endblock %}

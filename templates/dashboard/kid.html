@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Home — KidSpark{% endblock %}
+{% block content %}
+<div class="page-main">
+
+  <!-- HERO -->
+  <div class="hero f1">
+    <div class="hero-left">
+      <div class="hero-tag">🚀 Day {{ streak }} Streak!</div>
+      <div class="hero-name">Hey, <em>{{ name }}!</em> 👋</div>
+      <div class="hero-sub">Your personalized adventure continues today</div>
+      <div class="hero-actions">
+        <a href="{{ url_for('learning.recommendations') }}" class="btn btn-white btn-lg">▶ Continue Learning</a>
+        <a href="{{ url_for('dashboard.daily_challenge') }}" class="btn btn-outline-white btn-lg">🎯 Today's Challenge</a>
+      </div>
+    </div>
+    <!-- right side: cricket CSS illustration (based on top hobby) -->
+    <div class="hero-right">
+      {% if top_hobbies and top_hobbies[0]['subcategory'] in ['Cricket', 'Football'] %}
+      <!-- Sports illustration: cricket player -->
+      <div style="position:relative;width:190px;height:170px">
+        <div class="c-crowd"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="c-ground"></div><div class="c-pitch"></div>
+        <div class="c-stump cs1"></div><div class="c-stump cs2"></div><div class="c-stump cs3"></div>
+        <div class="c-bail"></div>
+        <div class="c-body"></div><div class="c-head"></div><div class="c-helmet"></div>
+        <div class="c-shirt"></div><div class="c-leg1"></div><div class="c-leg2"></div>
+        <div class="c-shoe1"></div><div class="c-shoe2"></div>
+        <div class="c-bat"><div class="c-bat-blade"></div></div>
+        <div class="c-ball"></div>
+      </div>
+      {% elif top_hobbies and top_hobbies[0]['subcategory'] in ['Drawing', 'Painting'] %}
+      <!-- Arts illustration: painter -->
+      <div style="position:relative;width:190px;height:170px">
+        <div class="ea-leg1"></div><div class="ea-leg2"></div>
+        <div class="ea-frame"><div class="ea-p1"></div><div class="ea-p2"></div><div class="ea-p3"></div></div>
+        <div class="ea-hair"></div><div class="ea-head"></div><div class="ea-body"></div>
+        <div class="ea-brush"><div class="ea-brush-tip"></div></div>
+        <div class="ea-splash"></div><div class="ea-splash"></div><div class="ea-splash"></div>
+      </div>
+      {% elif top_hobbies and top_hobbies[0]['subcategory'] == 'Coding' %}
+      <!-- Coding illustration -->
+      <div style="position:relative;width:190px;height:170px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:16px">
+        <div class="co-floats"><span>{  }</span><span>&lt;/&gt;</span><span>( )</span></div>
+        <div class="co-screen"><div class="co-line"></div><div class="co-line"></div><div class="co-line"></div><div class="co-line"></div><div class="co-cursor"></div></div>
+      </div>
+      {% else %}
+      <div style="font-size:6rem;text-align:center;animation:avIdle 3s ease-in-out infinite">🌟</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- TODAY'S MISSION -->
+  <div class="mission-card f2">
+    <div>
+      <div class="mission-badge">🎯 Today's Mission</div>
+      <div class="mission-title">{{ todays_lesson.lesson_title if todays_lesson else 'Start Your First Lesson!' }}</div>
+      <div class="mission-desc">Complete today's lesson and challenge to earn bonus XP</div>
+      <div class="mission-items">
+        <div class="mission-item">📚 Lesson: {{ todays_lesson.hobby_context if todays_lesson else 'Choose a topic' }}</div>
+        <div class="mission-item">⚡ Challenge: 2 Questions</div>
+        <div class="mission-item">⭐ Reward: +50 XP</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0">
+      <a href="{{ url_for('dashboard.daily_challenge') }}" class="btn btn-yellow btn-lg">Start Mission 🚀</a>
+      <div class="mission-note">Resets at midnight</div>
+    </div>
+  </div>
+
+  <!-- CONTINUE LEARNING + DID YOU KNOW -->
+  <div class="two-col f3">
+    <!-- Continue learning -->
+    <div class="card card-pad" style="display:flex;flex-direction:column;gap:14px;cursor:pointer" onclick="window.location='{{ url_for('learning.recommendations') }}'">
+      <div class="card-label">📚 Continue Where You Left Off</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--green-l),#a7f3d0);display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 12px rgba(16,185,129,0.2);flex-shrink:0">
+          {% if todays_lesson %}
+            {% if todays_lesson.hobby_context in ['Cricket', 'Football'] %}⚽
+            {% elif todays_lesson.hobby_context in ['Drawing', 'Painting'] %}🎨
+            {% elif todays_lesson.hobby_context == 'Singing' %}🎵
+            {% elif todays_lesson.hobby_context == 'Maths' %}🔢
+            {% elif todays_lesson.hobby_context == 'Science' %}🔬
+            {% elif todays_lesson.hobby_context == 'Coding' %}💻
+            {% else %}📚{% endif %}
+          {% else %}📚{% endif %}
+        </div>
+        <div>
+          <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:1.05rem;color:var(--dark);margin-bottom:3px">{{ todays_lesson.lesson_title if todays_lesson else 'Start your first lesson' }}</div>
+          <div style="font-size:0.8rem;font-weight:600;color:var(--muted)">{{ todays_lesson.hobby_context if todays_lesson else 'Pick a hobby topic' }} · Module 1 of 5</div>
+        </div>
+      </div>
+      <div>
+        <div class="prog-meta"><span>Progress</span><span>{{ (total_xp // 10) if total_xp else 0 }}%</span></div>
+        <div class="prog-track"><div class="prog-fill" data-width="{{ (total_xp // 10) if total_xp else 0 }}" style="width:0%"></div></div>
+      </div>
+      <a href="{{ url_for('learning.recommendations') }}" class="btn btn-primary btn-sm" style="align-self:flex-start">Resume Lesson →</a>
+    </div>
+    
+    <!-- Did you know -->
+    <div class="dyk-card">
+      <div class="dyk-label">💡 Did You Know?</div>
+      <div class="dyk-title">{{ top_hobbies[0]['subcategory'] if top_hobbies else 'Cricket' }} uses math every day!</div>
+      <div class="dyk-body">{% if top_hobbies and top_hobbies[0]['subcategory'] == 'Cricket' %}The run rate in cricket is calculated by dividing total runs by overs — that's exactly what fractions do!{% elif top_hobbies and top_hobbies[0]['subcategory'] == 'Football' %}Football players use angles and geometry to calculate the perfect shot trajectory!{% elif top_hobbies and top_hobbies[0]['subcategory'] == 'Drawing' %}Artists use the golden ratio (1.618) to create perfectly balanced compositions!{% else %}Every hobby connects to learning in amazing ways!{% endif %}</div>
+      <div class="dyk-chip">{{ '🏏 ' + top_hobbies[0]['subcategory'] if top_hobbies else '🌟 Fun Fact' }} · Mathematics</div>
+    </div>
+  </div>
+
+  <!-- RECENT BADGES -->
+  <div class="divider"></div>
+  <div class="sec-head f4">
+    <div class="sec-title">🏆 Recent Badges</div>
+    <a href="{{ url_for('dashboard.badges') }}" class="sec-link">View All →</a>
+  </div>
+  <div class="badges-grid f4">
+    {% if latest_badge %}
+    <div class="badge-card earned">
+      <div class="badge-glow"></div>
+      <span class="badge-icon">{{ latest_badge.icon }}</span>
+      <div class="badge-name">{{ latest_badge.name }}</div>
+      <div class="badge-desc">Recently earned!</div>
+      <div class="badge-date">Just now</div>
+    </div>
+    {% endif %}
+    
+    <!-- Show locked badges as preview -->
+    <div class="badge-card locked">
+      <span class="badge-icon">📚</span>
+      <div class="badge-name">Consistent Learner</div>
+      <div class="badge-desc">Complete 7 daily challenges</div>
+      <span class="badge-lock">🔒 {{ streak }}/7</span>
+    </div>
+    
+    <div class="badge-card locked">
+      <span class="badge-icon">⭐</span>
+      <div class="badge-name">Rising Star</div>
+      <div class="badge-desc">Reach intermediate level</div>
+      <span class="badge-lock">🔒 Keep learning!</span>
+    </div>
+    
+    <div class="badge-card locked">
+      <span class="badge-icon">🔥</span>
+      <div class="badge-name">Dedication Master</div>
+      <div class="badge-desc">30-day streak</div>
+      <span class="badge-lock">🔒 {{ streak }}/30</span>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
